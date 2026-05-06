@@ -22,20 +22,16 @@ public interface CommandSender {
     static CommandSender from(Object senderObj) {
         CommandSender sender;
 
-        if (senderObj instanceof CommandSender finalSender) {
-            return finalSender;
+        if (senderObj instanceof CommandSender self) {
+            return self;
         }
 
         if (Reflection.isProxyServer()) {
             sender = Reflection.isVelocityServer()
-                    ? new VelocitySender(senderObj)
-                    : new BungeeSender(senderObj);
+                    ? VelocitySender.from(senderObj)
+                    : BungeeSender.from(senderObj);
         } else {
-            sender = new BukkitSender(senderObj);
-        }
-
-        if (sender.getUniqueId() == null) {
-            return null;
+            sender = BukkitSender.from(senderObj);
         }
 
         return sender;

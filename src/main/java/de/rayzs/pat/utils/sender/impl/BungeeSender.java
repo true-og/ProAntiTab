@@ -11,56 +11,66 @@ import java.util.UUID;
 
 public class BungeeSender extends CommandSenderAbstract {
 
+
+    public static BungeeSender from(final Object obj) {
+        return obj instanceof UUID uuid ? from(uuid)
+                : obj instanceof ProxiedPlayer player ? from(player)
+                : obj instanceof CommandSender sender ? from(sender)
+                : null;
+    }
+
+    public static BungeeSender from(final UUID uuid) {
+        final ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+
+        return player != null
+                ? new BungeeSender(player, uuid, player.getName(), false)
+                : null;
+    }
+
+
+    public static BungeeSender from(final ProxiedPlayer player) {
+        return player != null ?
+                new BungeeSender(player, player.getUniqueId(), player.getName(), false)
+                : null;
+    }
+
+
+    public static BungeeSender from(final CommandSender sender) {
+        if (sender instanceof ProxiedPlayer player) {
+            return from(player);
+        }
+
+        return sender != null ?
+                new BungeeSender(sender, CONSOLE_UUID, sender.getName(), true)
+                : null;
+    }
+
+
     private final UUID uuid;
     private final String name;
-
-    private CommandSender sender;
-
     private final boolean console;
+    private final CommandSender sender;
 
-    public BungeeSender(Object senderObj) {
-        super(senderObj);
-
-        if (senderObj instanceof UUID uuid) {
-            final ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
-            this.uuid = uuid;
-            this.console = false;
-
-            this.sender = proxiedPlayer;
-            this.name = proxiedPlayer.getName();
-            return;
-        }
-
-        if (senderObj instanceof ProxiedPlayer player) {
-            this.sender = player;
-
-            this.name = player.getName();
-            this.uuid = player.getUniqueId();
-            this.console = false;
-            return;
-        }
-
-        this.sender = (CommandSender) senderObj;
-
-        if (sender != null) {
-            this.name = sender.getName();
-            this.uuid = CONSOLE_UUID;
-        } else {
-            this.name = null;
-            this.uuid = null;
-        }
-
-        this.console = true;
+    private BungeeSender(
+            final CommandSender sender,
+            final UUID uuid,
+            final String name,
+            final boolean console
+    ) {
+        this.uuid = uuid;
+        this.name = name;
+        this.console = console;
+        this.sender = sender;
     }
 
     @Override
     public boolean isConsole() {
-        return this.console;
+        return console;
     }
 
     @Override
     public boolean isPlayer() {
-        return !this.console;
+        return !console;
     }
 
     @Override
@@ -75,19 +85,19 @@ public class BungeeSender extends CommandSenderAbstract {
 
     @Override
     public UUID getUniqueId() {
-        return this.uuid;
+        return uuid;
     }
 
     @Override
     public String getName() {
-        return this.name;
+        return name;
     }
 
     @Override
     public String getServerName() {
         return console
                 ? Storage.SERVER_NAME
-                : Storage.getLoader().getPlayerServerName(this.uuid);
+                : Storage.getLoader().getPlayerServerName(uuid);
     }
 
     @Override
@@ -98,5 +108,10 @@ public class BungeeSender extends CommandSenderAbstract {
         }
 
         sender.sendMessage(MessageTranslator.replaceMessage(sender, message));
+    }
+
+    @Override
+    public Object getSenderObject() {
+        return sender;
     }
 }

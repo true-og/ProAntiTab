@@ -12,57 +12,65 @@ import java.util.UUID;
 
 public class BukkitSender extends CommandSenderAbstract {
 
+    public static BukkitSender from(final Object obj) {
+        return obj instanceof UUID uuid ? from(uuid)
+                : obj instanceof Player player ? from(player)
+                : obj instanceof CommandSender sender ? from(sender)
+                : null;
+    }
+
+    public static BukkitSender from(final UUID uuid) {
+        final Player player = Bukkit.getPlayer(uuid);
+
+        return player != null
+                ? new BukkitSender(player, uuid, player.getName(), false)
+                : null;
+    }
+
+
+    public static BukkitSender from(final Player player) {
+        return player != null ?
+                new BukkitSender(player, player.getUniqueId(), player.getName(), false)
+                : null;
+    }
+
+
+    public static BukkitSender from(final CommandSender sender) {
+        if (sender instanceof Player player) {
+            return from(player);
+        }
+
+        return sender != null ?
+                new BukkitSender(sender, CONSOLE_UUID, sender.getName(), true)
+                : null;
+    }
+
+
     private final UUID uuid;
     private final String name;
     private final boolean console;
+    private final CommandSender sender;
 
-    private CommandSender sender;
-
-    public BukkitSender(Object senderObj) {
-        super(senderObj);
-
-        if (senderObj instanceof UUID uuid) {
-            final Player player = Bukkit.getPlayer(uuid);
-
-            this.uuid = uuid;
-            this.console = false;
-
-            this.sender = player;
-            this.name = player.getName();
-            return;
-        }
-
-        if (senderObj instanceof Player player) {
-            this.sender = player;
-
-            this.name = player.getName();
-            this.uuid = player.getUniqueId();
-            this.console = false;
-
-            return;
-        }
-
-        this.sender = (CommandSender) senderObj;
-
-        if (sender != null) {
-            this.name = sender.getName();
-            this.uuid = CONSOLE_UUID;
-        } else {
-            this.name = null;
-            this.uuid = null;
-        }
-
-        this.console = true;
+    private BukkitSender(
+            final CommandSender sender,
+            final UUID uuid,
+            final String name,
+            final boolean console
+    ) {
+        this.uuid = uuid;
+        this.name = name;
+        this.console = console;
+        this.sender = sender;
     }
 
     @Override
     public boolean isConsole() {
-        return this.console;
+        return console;
     }
 
     @Override
     public boolean isPlayer() {
-        return !this.console;
+        return !console;
     }
 
     @Override
@@ -77,12 +85,12 @@ public class BukkitSender extends CommandSenderAbstract {
 
     @Override
     public UUID getUniqueId() {
-        return this.uuid;
+        return uuid;
     }
 
     @Override
     public String getName() {
-        return this.name;
+        return name;
     }
 
     @Override
@@ -109,5 +117,10 @@ public class BukkitSender extends CommandSenderAbstract {
         }
 
         sender.sendMessage(MessageTranslator.replaceMessage(sender, message));
+    }
+
+    @Override
+    public Object getSenderObject() {
+        return sender;
     }
 }
