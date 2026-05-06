@@ -110,11 +110,15 @@ public class LuckPermsHook {
         if (!relevant && !inheritance)
             return;
 
-        if (event.isUser() && event.getTarget() instanceof User) {
-            final User user = (User) event.getTarget();
-            final UUID uuid = user.getUniqueId();
+        if (event.getTarget() instanceof User user) {
+            final CommandSender sender = CommandSender.from(user.getUniqueId());
 
-            final CommandSender sender = CommandSender.from(uuid);
+            if (sender == null) {
+                Logger.info("Tried to update a users' PAT commands after updating its LP permissions, but user couldn't be found by PAT. (" + user.getUsername() + " / " + user.getUniqueId() + ")");
+                return;
+            }
+
+
             final String serverName = sender.getServerName();
 
             if (Reflection.isProxyServer()) {
@@ -126,7 +130,7 @@ public class LuckPermsHook {
 
                 SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);
 
-                Communicator.Proxy2Backend.sendUpdateCommand(uuid, serverName);
+                Communicator.Proxy2Backend.sendUpdateCommand(user.getUniqueId(), serverName);
             }
 
             Storage.getLoader().delayedPermissionsReload();
