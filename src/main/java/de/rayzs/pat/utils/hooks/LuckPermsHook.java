@@ -114,7 +114,6 @@ public class LuckPermsHook {
             final CommandSender sender = CommandSender.from(user.getUniqueId());
 
             if (sender == null) {
-                Logger.info("Tried to update a users' PAT commands after updating its LP permissions, but user couldn't be found by PAT. (" + user.getUsername() + " / " + user.getUniqueId() + ")");
                 return;
             }
 
