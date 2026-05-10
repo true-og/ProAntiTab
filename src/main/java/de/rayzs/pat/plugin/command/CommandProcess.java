@@ -254,4 +254,8 @@ public class CommandProcess {
             return suggestion.startsWith(command);
         }).toList();
     }
+
+    public static List<ProCommand> getCommands() {
+        return COMMANDS;
+    }
 }
