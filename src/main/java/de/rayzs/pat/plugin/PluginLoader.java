@@ -9,6 +9,9 @@ import java.util.UUID;
 
 public interface PluginLoader {
 
+    void addPermission(String permission);
+    void removePermission(String permission);
+
     Object getPluginObj();
 
     void handleReload();

@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin;
 
+import de.rayzs.pat.plugin.command.commands.ProCommand;
 import de.rayzs.pat.plugin.system.communication.cph.impl.BukkitCommunicationHandler;
 import de.rayzs.pat.plugin.system.serverbrand.CustomServerBrand;
 import de.rayzs.pat.plugin.system.communication.pmc.impl.BukkitPluginMessageClient;
@@ -9,6 +10,7 @@ import de.rayzs.pat.plugin.command.CommandProcess;
 import de.rayzs.pat.plugin.packetanalyzer.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.plugin.system.communication.BackendUpdater;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
+import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.hooks.GroupManagerHook;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
@@ -28,6 +30,7 @@ import de.rayzs.pat.utils.response.action.ActionHandler;
 import de.rayzs.pat.utils.sender.CommandSender;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.scheduler.*;
@@ -151,6 +154,32 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             Storage.reload();
             loadAllCommands();
         });
+
+
+        for (final ProCommand command : CommandProcess.getCommands()) {
+            addPermission("proantitab." + command.getName());
+        }
+
+        for (final Group group : GroupManager.getGroups()) {
+            addPermission("proantitab.group." + group.getGroupName());
+        }
+    }
+
+    @Override
+    public void addPermission(final String permission) {
+        final PluginManager manager = getServer().getPluginManager();
+
+        if (manager.getPermission(permission) == null) {
+            manager.addPermission(new Permission(permission));
+        }
+    }
+
+    @Override
+    public void removePermission(String permission) {
+        final PluginManager manager = getServer().getPluginManager();
+        final Permission perm = manager.getPermission(permission);
+
+        if (perm != null) manager.removePermission(perm);
     }
 
     @Override

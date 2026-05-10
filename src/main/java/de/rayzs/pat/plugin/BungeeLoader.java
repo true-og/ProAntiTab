@@ -128,6 +128,12 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     @Override
+    public void addPermission(String permission) {}
+
+    @Override
+    public void removePermission(String permission) {}
+
+    @Override
     public Object getPluginObj() {
         return plugin;
     }

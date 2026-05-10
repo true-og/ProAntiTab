@@ -134,6 +134,12 @@ public class VelocityLoader implements PluginLoader {
     }
 
     @Override
+    public void addPermission(String permission) {}
+
+    @Override
+    public void removePermission(String permission) {}
+
+    @Override
     public Object getPluginObj() {
         return instance;
     }
