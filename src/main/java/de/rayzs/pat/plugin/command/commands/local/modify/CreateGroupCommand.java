@@ -34,12 +34,13 @@ public class CreateGroupCommand extends ProCommand {
             return true;
         }
 
-        String groupName = args[0];
+        String groupName = args[0].toLowerCase();
         Group group = GroupManager.getGroupByName(groupName);
         boolean registered = group != null;
 
         if (!registered) {
             GroupManager.registerGroup(groupName);
+            Storage.getLoader().addPermission("proantitab.group." + groupName);
         } else groupName = group.getGroupName();
 
         String message = registered ? Storage.ConfigSections.Messages.GROUP.ALREADY_EXIST : Storage.ConfigSections.Messages.GROUP.CREATE;
