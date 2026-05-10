@@ -58,6 +58,7 @@ public class DeleteGroupCommand extends ProCommand {
         }
 
         GroupManager.unregisterGroup(groupName);
+        Storage.getLoader().removePermission("proantitab.group." + group.getGroupName());
         CONFIRMATION.remove(sender.getUniqueId());
 
         String message = registered ? Storage.ConfigSections.Messages.GROUP.DELETE : Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST;
