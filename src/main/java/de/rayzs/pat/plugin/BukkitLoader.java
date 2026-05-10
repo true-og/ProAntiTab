@@ -157,18 +157,19 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
 
         for (final ProCommand command : CommandProcess.getCommands()) {
-            addPermission("proantitab." + command.getName());
+            addPermission(command.getName());
         }
 
         for (final Group group : GroupManager.getGroups()) {
-            addPermission("proantitab.group." + group.getGroupName());
+            addPermission("group." + group.getGroupName());
         }
     }
 
     @Override
-    public void addPermission(final String permission) {
-        final PluginManager manager = getServer().getPluginManager();
+    public void addPermission(String permission) {
+        permission = "proantitab." + permission;
 
+        final PluginManager manager = getServer().getPluginManager();
         if (manager.getPermission(permission) == null) {
             manager.addPermission(new Permission(permission));
         }
@@ -177,7 +178,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     @Override
     public void removePermission(String permission) {
         final PluginManager manager = getServer().getPluginManager();
-        final Permission perm = manager.getPermission(permission);
+        final Permission perm = manager.getPermission("proantitab." + permission);
 
         if (perm != null) manager.removePermission(perm);
     }

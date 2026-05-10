@@ -40,7 +40,7 @@ public class CreateGroupCommand extends ProCommand {
 
         if (!registered) {
             GroupManager.registerGroup(groupName);
-            Storage.getLoader().addPermission("proantitab.group." + groupName);
+            Storage.getLoader().addPermission("group." + groupName);
         } else groupName = group.getGroupName();
 
         String message = registered ? Storage.ConfigSections.Messages.GROUP.ALREADY_EXIST : Storage.ConfigSections.Messages.GROUP.CREATE;
