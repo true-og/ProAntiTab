@@ -54,9 +54,7 @@ public class PacketUtils {
         private ByteBuf byteBuf;
 
         public BrandManipulate(String brand) {
-            this.brand = brand;
-            this.capacity = brand.getBytes(StandardCharsets.UTF_8).length + 1;
-            this.bytes = buildBytes(true);
+            this(brand, true);
         }
 
         public BrandManipulate(String brand, boolean releaseBuffer) {
