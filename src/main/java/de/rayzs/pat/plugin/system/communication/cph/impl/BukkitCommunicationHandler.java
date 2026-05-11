@@ -119,11 +119,14 @@ public class BukkitCommunicationHandler implements CommunicationPacketHandler {
     }
 
     private boolean isP2BDisabled() {
-        if (!sentP2BWarningBefore && !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ALLOW_P2B_ACTIONS) {
-            sentP2BWarningBefore = true;
+        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ALLOW_P2B_ACTIONS) {
+            if (!sentP2BWarningBefore) {
+                sentP2BWarningBefore = true;
 
-            Logger.warning("P2B actions are currently disabled! You need to enable them manually.");
-            Logger.warning("For that, go to your 'plugins/ProAntiTab/config.yml' file and enable 'handle-through-proxy -> allow-p2b-actions'.");
+                Logger.warning("P2B actions are currently disabled! You need to enable them manually.");
+                Logger.warning("For that, go to your 'plugins/ProAntiTab/config.yml' file and enable 'handle-through-proxy -> allow-p2b-actions'.");
+            }
+
             return true;
         }
 
