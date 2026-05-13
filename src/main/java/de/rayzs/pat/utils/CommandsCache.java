@@ -167,7 +167,7 @@ public class CommandsCache {
         filteredCommands = null;
     }
 
-    public boolean isOutdated(List<String> commands) {
-        return filteredCommands == null || !ArrayUtils.compareStringArrays(commands, allCommands);
+    public boolean isOutdated(final List<String> commands) {
+        return filteredCommands == null || !ArrayUtils.isSame(commands, allCommands);
     }
 }
