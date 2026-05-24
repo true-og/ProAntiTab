@@ -7,6 +7,7 @@ import de.rayzs.pat.utils.sender.CommandSender;
 import net.luckperms.api.context.ImmutableContextSet;
 import net.luckperms.api.event.sync.PreNetworkSyncEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import net.luckperms.api.model.PermissionHolder;
 import net.luckperms.api.model.user.User;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
@@ -32,8 +33,14 @@ public class LuckPermsHook {
 
         eventBus.subscribe(
                 Storage.getLoader().getPluginObj(),
-                NodeMutateEvent.class,
-                LuckPermsHook::onNoteMutate
+                NodeAddEvent.class,
+                event -> onNoteMutate(event.getTarget(), event.getNode())
+        );
+
+        eventBus.subscribe(
+                Storage.getLoader().getPluginObj(),
+                NodeRemoveEvent.class,
+                event -> onNoteMutate(event.getTarget(), event.getNode())
         );
 
         eventBus.subscribe(
@@ -92,47 +99,34 @@ public class LuckPermsHook {
         }
     }
 
-    private static void onNoteMutate(NodeMutateEvent event) {
-        boolean relevant = false, inheritance = false;
-
-        if (event.isUser())
-            for (Node node : event.getDataAfter()) {
-
-            if (!inheritance)
-                inheritance = node.getType() == NodeType.INHERITANCE;
-
-            if (node.getType() != NodeType.PERMISSION && (node.getKey().startsWith("proantitab.") || !node.getKey().equals("*"))) {
-                relevant = true;
-                break;
-            }
-        }
-
-        if (!relevant && !inheritance)
+    private static void onNoteMutate(PermissionHolder holder, Node node) {
+        if (node.getType() != NodeType.PERMISSION || !(holder instanceof User user)) {
             return;
-
-        if (event.getTarget() instanceof User user) {
-            final CommandSender sender = CommandSender.from(user.getUniqueId());
-
-            if (sender == null) {
-                return;
-            }
-
-
-            final String serverName = sender.getServerName();
-
-            if (Reflection.isProxyServer()) {
-                final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
-                final List<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
-
-                final List<String> playerCommands = new ArrayList<>(serverCommands);
-                playerCommands.addAll(groupCommands);
-
-                SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);
-
-                Communicator.Proxy2Backend.sendUpdateCommand(user.getUniqueId(), serverName);
-            }
-
-            Storage.getLoader().delayedPermissionsReload();
         }
+
+        if (!node.getKey().startsWith("proantitab.group.") && !node.getKey().equals("*")) {
+            return;
+        }
+
+        final CommandSender sender = CommandSender.from(user.getUniqueId());
+        if (sender == null) {
+            return;
+        }
+
+
+        final String serverName = sender.getServerName();
+
+        if (Reflection.isProxyServer()) {
+            final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
+            final List<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
+
+            final List<String> playerCommands = new ArrayList<>(serverCommands);
+            playerCommands.addAll(groupCommands);
+
+            SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);
+            Communicator.Proxy2Backend.sendUpdateCommand(user.getUniqueId(), serverName);
+        }
+
+        Storage.getLoader().delayedPermissionsReload();
     }
 }
