@@ -34,13 +34,19 @@ public class LuckPermsHook {
         eventBus.subscribe(
                 Storage.getLoader().getPluginObj(),
                 NodeAddEvent.class,
-                event -> onNoteMutate(event.getTarget(), event.getNode())
+                event -> handleNodeChange(event.getTarget(), event.getNode())
         );
 
         eventBus.subscribe(
                 Storage.getLoader().getPluginObj(),
                 NodeRemoveEvent.class,
-                event -> onNoteMutate(event.getTarget(), event.getNode())
+                event -> handleNodeChange(event.getTarget(), event.getNode())
+        );
+
+        eventBus.subscribe(
+                Storage.getLoader().getPluginObj(),
+                NodeClearEvent.class,
+                event -> handleNodesChange(event.getTarget(), event.getNodes())
         );
 
         eventBus.subscribe(
@@ -48,17 +54,6 @@ public class LuckPermsHook {
                 PreNetworkSyncEvent.class,
                 event -> Storage.getLoader().delayedPermissionsReload()
         );
-    }
-
-
-    public static User getUser(UUID uuid) {
-
-        if (uuid == null) {
-            Logger.warning("Attempted to get LuckPerms user with null UUID!");
-            return null;
-        }
-
-        return PROVIDER.getUserManager().getUser(uuid);
     }
 
     public static Map<String, Boolean> getPermissions(UUID uuid) {
@@ -99,36 +94,66 @@ public class LuckPermsHook {
         }
     }
 
-    private static void onNoteMutate(PermissionHolder holder, Node node) {
+    private static void handleNodesChange(PermissionHolder holder, Set<Node> nodes) {
+        boolean relevant = false;
+
+        for (Node node : nodes) {
+            if (node.getType() != NodeType.PERMISSION) {
+                continue;
+            }
+
+            final String key = node.getKey();
+            if (key.startsWith("proantitab.") || key.equals("*")) {
+                relevant = true;
+                break;
+            }
+        }
+
+        if (!relevant) {
+            return;
+        }
+
+        handleAfterNodeChange(holder);
+    }
+
+    private static void handleNodeChange(PermissionHolder holder, Node node) {
         if (node.getType() != NodeType.PERMISSION) {
             return;
         }
 
-        if (!node.getKey().startsWith("proantitab.") && !node.getKey().equals("*")) {
+        final String key = node.getKey();
+        if (!key.startsWith("proantitab.") && !key.equals("*")) {
             return;
         }
 
-        if (holder instanceof User user) {
-            final CommandSender sender = CommandSender.from(user.getUniqueId());
-            if (sender == null) {
-                return;
-            }
+        handleAfterNodeChange(holder);
+    }
 
-
-            final String serverName = sender.getServerName();
-
-            if (Reflection.isProxyServer()) {
-                final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
-                final List<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
-
-                final List<String> playerCommands = new ArrayList<>(serverCommands);
-                playerCommands.addAll(groupCommands);
-
-                SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);
-                Communicator.Proxy2Backend.sendUpdateCommand(user.getUniqueId(), serverName);
-            }
+    private static void handleAfterNodeChange(PermissionHolder holder) {
+        if (! (holder instanceof User user)) {
+            Storage.getLoader().delayedPermissionsReload();
+            return;
         }
 
-        Storage.getLoader().delayedPermissionsReload();
+        final CommandSender sender = CommandSender.from(user.getUniqueId());
+        if (sender == null) {
+            return;
+        }
+
+
+        final String serverName = sender.getServerName();
+
+        if (Reflection.isProxyServer()) {
+            final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
+            final List<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
+
+            final List<String> playerCommands = new ArrayList<>(serverCommands);
+            playerCommands.addAll(groupCommands);
+
+            SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);
+            Communicator.Proxy2Backend.sendUpdateCommand(user.getUniqueId(), serverName);
+        }
+
+        Storage.getLoader().delayedPermissionsReload(sender);
     }
 }
