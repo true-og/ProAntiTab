@@ -100,31 +100,33 @@ public class LuckPermsHook {
     }
 
     private static void onNoteMutate(PermissionHolder holder, Node node) {
-        if (node.getType() != NodeType.PERMISSION || !(holder instanceof User user)) {
+        if (node.getType() != NodeType.PERMISSION) {
             return;
         }
 
-        if (!node.getKey().startsWith("proantitab.group.") && !node.getKey().equals("*")) {
+        if (!node.getKey().startsWith("proantitab.") && !node.getKey().equals("*")) {
             return;
         }
 
-        final CommandSender sender = CommandSender.from(user.getUniqueId());
-        if (sender == null) {
-            return;
-        }
+        if (holder instanceof User user) {
+            final CommandSender sender = CommandSender.from(user.getUniqueId());
+            if (sender == null) {
+                return;
+            }
 
 
-        final String serverName = sender.getServerName();
+            final String serverName = sender.getServerName();
 
-        if (Reflection.isProxyServer()) {
-            final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
-            final List<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
+            if (Reflection.isProxyServer()) {
+                final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
+                final List<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
 
-            final List<String> playerCommands = new ArrayList<>(serverCommands);
-            playerCommands.addAll(groupCommands);
+                final List<String> playerCommands = new ArrayList<>(serverCommands);
+                playerCommands.addAll(groupCommands);
 
-            SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);
-            Communicator.Proxy2Backend.sendUpdateCommand(user.getUniqueId(), serverName);
+                SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);
+                Communicator.Proxy2Backend.sendUpdateCommand(user.getUniqueId(), serverName);
+            }
         }
 
         Storage.getLoader().delayedPermissionsReload();
