@@ -34,6 +34,6 @@ public class BlockNamespaceCommandsSection extends ConfigStorage {
     }
 
     public boolean doesBypass(CommandSender sender) {
-        return !ENABLED || PermissionUtil.hasPermission(sender, "proantitab.namespace");
+        return !ENABLED || PermissionUtil.hasPermission(sender, "namespace");
     }
 }
