@@ -18,8 +18,6 @@ public class BungeeServerBrand implements ServerBrand {
     private static ScheduledTask TASK;
     private static String BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0);
 
-    public BungeeServerBrand() { }
-
     @Override
     public void initializeTask() {
         if(TASK != null) {
