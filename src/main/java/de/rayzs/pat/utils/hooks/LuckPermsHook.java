@@ -5,6 +5,7 @@ import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.sender.CommandSender;
 import net.luckperms.api.context.ImmutableContextSet;
+import net.luckperms.api.event.LuckPermsEvent;
 import net.luckperms.api.event.sync.PreNetworkSyncEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.luckperms.api.model.PermissionHolder;
@@ -34,8 +35,7 @@ public class LuckPermsHook {
         eventBus.subscribe(
                 Storage.getLoader().getPluginObj(),
                 NodeAddEvent.class,
-                event -> handleNodeChange(event.getTarget(), event.getNode())
-        );
+                event -> handleNodeChange(event.getTarget(), event.getNode()));
 
         eventBus.subscribe(
                 Storage.getLoader().getPluginObj(),
@@ -102,8 +102,7 @@ public class LuckPermsHook {
                 continue;
             }
 
-            final String key = node.getKey();
-            if (key.startsWith("proantitab.") || key.equals("*")) {
+            if (isRelevantPermission(node)) {
                 relevant = true;
                 break;
             }
@@ -117,12 +116,11 @@ public class LuckPermsHook {
     }
 
     private static void handleNodeChange(PermissionHolder holder, Node node) {
-        if (node.getType() != NodeType.PERMISSION) {
+        if (node.getType() != NodeType.PERMISSION && node.getType() != NodeType.INHERITANCE) {
             return;
         }
 
-        final String key = node.getKey();
-        if (!key.startsWith("proantitab.") && !key.equals("*")) {
+        if (!isRelevantPermission(node)) {
             return;
         }
 
@@ -155,5 +153,13 @@ public class LuckPermsHook {
         }
 
         Storage.getLoader().delayedPermissionsReload(sender);
+    }
+
+    private static boolean isRelevantPermission(Node node) {
+        final String key = node.getKey();
+
+        return key.startsWith("group.")
+                || key.startsWith("proantitab.")
+                || key.equals("*");
     }
 }
