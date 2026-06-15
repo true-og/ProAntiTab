@@ -27,6 +27,7 @@ public class CustomServerBrand {
 
     private CustomServerBrand(ServerBrand serverBrand) {
         this.serverBrand = serverBrand;
+        this.serverBrand.initializeTask();
     }
 
     public void refreshTask() {
