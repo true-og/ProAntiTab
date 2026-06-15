@@ -77,11 +77,12 @@ public class ModernPacketHandler implements BukkitPacketHandler {
 
         int spaces = 0;
         if(input.startsWith("/") || is121Packet) {
-            input = input.replace("/", "");
-            if(input.contains(" ")) {
+            input = input.substring(1);
+
+            if (input.contains(" ")) {
                 String[] split = input.split(" ");
                 spaces = split.length;
-                if(spaces > 0) input = split[0];
+                if (spaces > 0) input = split[0];
             }
 
             cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, input);
