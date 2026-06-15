@@ -8,6 +8,7 @@ import de.rayzs.pat.plugin.*;
 import net.md_5.bungee.event.*;
 import net.md_5.bungee.api.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BungeePingListener implements Listener {
@@ -44,8 +45,43 @@ public class BungeePingListener implements Listener {
             List<String> lines = Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines();
             ServerPing.PlayerInfo[] playerInfos = new ServerPing.PlayerInfo[lines.size()];
 
-            for (int i = 0; i < lines.size(); i++) {
-                playerInfos[i] = new ServerPing.PlayerInfo(replaceString(lines.get(i), online, onlineExtend, max), "");
+            if (!Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_CENTER_VARIABLE) {
+
+                for (int i = 0; i < lines.size(); i++) {
+                    String line = replaceString(lines.get(i), online, onlineExtend, max);
+                    playerInfos[i] = new ServerPing.PlayerInfo(line, "");
+                }
+
+            } else {
+                List<String> cpyLines = new ArrayList<>(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines());
+
+                int biggestLine = 0;
+                for (int i = 0; i < cpyLines.size(); i++) {
+                    String line = replaceString(cpyLines.get(i), online, onlineExtend, max);
+                    cpyLines.set(i, line);
+
+                    if (line.startsWith("%center%")) {
+                        biggestLine = Math.max(biggestLine, Math.max(0, line.length() - 8));
+                    }
+                }
+
+                for (int i = 0; i < cpyLines.size(); i++) {
+                    String line = cpyLines.get(i);
+
+                    if (line.startsWith("%center%")) {
+                        int length = Math.max(0, line.length() - 8);
+                        int diff = biggestLine - length;
+
+                        int left = diff / 2;
+                        int right = diff - left;
+
+                        line = " ".repeat(left)
+                                + line.substring(8)
+                                + " ".repeat(right);
+                    }
+
+                    playerInfos[i] = new ServerPing.PlayerInfo(line, "");
+                }
             }
 
             serverPing.getPlayers().setSample(playerInfos);

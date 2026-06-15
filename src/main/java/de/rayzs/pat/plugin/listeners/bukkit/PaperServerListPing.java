@@ -13,7 +13,6 @@ import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.plaf.BorderUIResource;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -52,8 +51,9 @@ public class PaperServerListPing implements Listener {
 
             } else {
 
-                Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines().forEach(line -> {
+                final List<String> lines = new ArrayList<>();
 
+                for (String line : Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines()) {
                     if (line.contains("%players%")) {
                         List<String> playerNames = Storage.getLoader().getOnlinePlayerNames();
 
@@ -66,7 +66,7 @@ public class PaperServerListPing implements Listener {
                                     "%players%", currentPlayerName, "&", "§"
                             );
 
-                            event.getPlayerSample().add(new ProtocolHoverLine(playerName, RANDOM_UUID));
+                            lines.add(playerName);
                         }
 
                     } else {
@@ -78,14 +78,47 @@ public class PaperServerListPing implements Listener {
                                     ? Arrays.copyOfRange(nameSplit, 0, 30)
                                     : nameSplit;
 
-                            for (String name : nameSplit) {
-                                event.getPlayerSample().add(new ProtocolHoverLine(name, RANDOM_UUID));
-                            }
-
+                            lines.addAll(Arrays.asList(nameSplit));
                         } else {
-                            event.getPlayerSample().add(new ProtocolHoverLine(playerName, RANDOM_UUID));
+                            lines.add(playerName);
                         }
                     }
+                }
+
+                if (Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_CENTER_VARIABLE) {
+
+                    int biggestLine = 0;
+                    for (int i = 0; i < lines.size(); i++) {
+                        String line = replaceString(lines.get(i), online, onlineExtend, max);
+                        lines.set(i, line);
+
+                        if (line.startsWith("%center%")) {
+                            biggestLine = Math.max(biggestLine, Math.max(0, line.length() - 8));
+                        }
+                    }
+
+                    for (int i = 0; i < lines.size(); i++) {
+                        String line = lines.get(i);
+
+                        if (line.startsWith("%center%")) {
+                            int length = Math.max(0, line.length() - 8);
+                            int diff = biggestLine - length;
+
+                            int left = diff / 2;
+                            int right = diff - left;
+
+                            line = " ".repeat(left)
+                                    + line.substring(8)
+                                    + " ".repeat(right);
+
+                            lines.set(i, line);
+                        }
+                    }
+
+                }
+
+                lines.forEach(line -> {
+                    event.getPlayerSample().add(new ProtocolHoverLine(line, RANDOM_UUID));
                 });
             }
         }

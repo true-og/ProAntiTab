@@ -5,6 +5,9 @@ import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.event.Subscribe;
 import de.rayzs.pat.api.storage.Storage;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class VelocityPingListener {
@@ -40,9 +43,43 @@ public class VelocityPingListener {
             builder.clearSamplePlayers();
         else if (Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_CUSTOM_PLAYERLIST) {
             builder.clearSamplePlayers();
-            Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines().forEach(line ->
-                    builder.samplePlayers(new ServerPing.SamplePlayer(replaceString(line, online, extend, max), RANDOM_UUID))
-            );
+
+            if (!Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_CENTER_VARIABLE) {
+
+                Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines().forEach(line ->
+                        builder.samplePlayers(new ServerPing.SamplePlayer(replaceString(line, online, extend, max), RANDOM_UUID))
+                );
+
+            } else {
+                List<String> cpyLines = new ArrayList<>(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines());
+
+                int biggestLine = 0;
+                for (int i = 0; i < cpyLines.size(); i++) {
+                    String line = replaceString(cpyLines.get(i), online, extend, max);
+                    cpyLines.set(i, line);
+
+                    if (line.startsWith("%center%")) {
+                        biggestLine = Math.max(biggestLine, Math.max(0, line.length() - 8));
+                    }
+                }
+
+                for (String line : cpyLines) {
+                    if (line.startsWith("%center%")) {
+                        int length = Math.max(0, line.length() - 8);
+                        int diff = biggestLine - length;
+
+                        int left = diff / 2;
+                        int right = diff - left;
+
+                        line = " ".repeat(left)
+                                + line.substring(8)
+                                + " ".repeat(right);
+                    }
+
+                    builder.samplePlayers(new ServerPing.SamplePlayer(line, RANDOM_UUID));
+                }
+
+            }
         }
 
         event.setPing(builder.build());

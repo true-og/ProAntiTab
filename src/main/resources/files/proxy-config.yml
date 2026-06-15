@@ -101,6 +101,7 @@ custom-protocol-ping:
     enabled: true
 
     # Available placeholders:
+    # %center%            - centralize text
     # %online%            - current online player count
     # %max%               - max player count
     list:
