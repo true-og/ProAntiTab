@@ -24,81 +24,121 @@ public class VelocityServerBrand implements ServerBrand {
 
     @Override
     public void initializeTask() {
-        if(TASK != null) TASK.cancel();
 
-        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
+        if (TASK != null)
+            TASK.cancel();
 
-        if(pluginMessagePacketClass == null)
-            pluginMessagePacketClass = Reflection.getClass("com.velocitypowered.proxy.protocol.packet.PluginMessagePacket");
+        if (!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED)
+            return;
 
-        if(minecraftConnectionClass == null)
+        if (pluginMessagePacketClass == null)
+            pluginMessagePacketClass = Reflection
+                    .getClass("com.velocitypowered.proxy.protocol.packet.PluginMessagePacket");
+
+        if (minecraftConnectionClass == null)
             minecraftConnectionClass = Reflection.getClass("com.velocitypowered.proxy.connection.MinecraftConnection");
 
-        if(connectedPlayerConnectionClass == null)
-            connectedPlayerConnectionClass = Reflection.getClass("com.velocitypowered.proxy.connection.client.ConnectedPlayer");
+        if (connectedPlayerConnectionClass == null)
+            connectedPlayerConnectionClass = Reflection
+                    .getClass("com.velocitypowered.proxy.connection.client.ConnectedPlayer");
 
-        if(connectionMethod == null)
+        if (connectionMethod == null)
             connectionMethod = Reflection.getMethodByName(connectedPlayerConnectionClass, "getConnection");
 
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
-            BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)) + "§r";
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+
+            BRAND = MessageTranslator
+                    .replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)) + "§r";
             SERVER.getAllPlayers().forEach(this::send);
+
         } else {
+
             AtomicInteger animationState = new AtomicInteger(0);
             TASK = SERVER.getScheduler().buildTask(VelocityLoader.getInstance(), () -> {
-                if (animationState.getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1)
+
+                if (animationState
+                        .getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1)
                     animationState.set(0);
-                BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get())) + "§r";
+                BRAND = MessageTranslator.replaceMessage(
+                        Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get()))
+                        + "§r";
                 SERVER.getAllPlayers().forEach(this::send);
+
             }).repeat(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY, TimeUnit.MILLISECONDS).schedule();
+
         }
+
     }
 
-
     @Override
-    public void preparePlayer(Object playerObj) { }
+    public void preparePlayer(Object playerObj) {
+
+    }
 
     @Override
     public void send(Object playerObj) {
-        if (!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
+
+        if (!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED)
+            return;
 
         try {
+
             Player player = (Player) playerObj;
             Object connectedPlayerObj = connectedPlayerConnectionClass.cast(player),
                     minecraftConnectionObj = connectionMethod.invoke(connectedPlayerObj);
 
             String serverName = "", playerName = player.getUsername(), customBrand;
             Optional<ServerConnection> serverConnection = player.getCurrentServer();
-            if(serverConnection.isPresent()) serverName = serverConnection.get().getServerInfo().getName();
-            customBrand = BRAND.replace("%player%", playerName).replace("%server%", serverName).replace("%ping%", String.valueOf(player.getPing()));
+            if (serverConnection.isPresent())
+                serverName = serverConnection.get().getServerInfo().getName();
+            customBrand = BRAND.replace("%player%", playerName).replace("%server%", serverName).replace("%ping%",
+                    String.valueOf(player.getPing()));
 
             PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(customBrand, false);
-            String brand = player.getProtocolVersion().getProtocol() >= ProtocolConstants.MINECRAFT_1_13 ? "minecraft:brand" : "MC|Brand";
-            Object pluginMessagePacket = pluginMessagePacketClass.getConstructor(String.class, ByteBuf.class).newInstance(brand, serverBrand.getByteBuf());
-            Reflection.getMethodsByParameterAndName(minecraftConnectionObj, "write", Object.class).get(0).invoke(minecraftConnectionObj, pluginMessagePacket);
+            String brand = player.getProtocolVersion().getProtocol() >= ProtocolConstants.MINECRAFT_1_13
+                    ? "minecraft:brand"
+                    : "MC|Brand";
+            Object pluginMessagePacket = pluginMessagePacketClass.getConstructor(String.class, ByteBuf.class)
+                    .newInstance(brand, serverBrand.getByteBuf());
+            Reflection.getMethodsByParameterAndName(minecraftConnectionObj, "write", Object.class).get(0)
+                    .invoke(minecraftConnectionObj, pluginMessagePacket);
+
         } catch (Exception exception) {
+
             exception.printStackTrace();
+
         }
+
     }
 
     @Override
     public PacketUtils.BrandManipulate createPacket(Object playerObj) {
-        if (!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return null;
+
+        if (!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED)
+            return null;
 
         try {
+
             Player player = (Player) playerObj;
 
             String serverName = "", playerName = player.getUsername(), customBrand;
             Optional<ServerConnection> serverConnection = player.getCurrentServer();
 
-            if(serverConnection.isPresent()) serverName = serverConnection.get().getServerInfo().getName();
-            customBrand = BRAND.replace("%player%", playerName).replace("%server%", serverName).replace("%ping%", String.valueOf(player.getPing()));
+            if (serverConnection.isPresent())
+                serverName = serverConnection.get().getServerInfo().getName();
+            customBrand = BRAND.replace("%player%", playerName).replace("%server%", serverName).replace("%ping%",
+                    String.valueOf(player.getPing()));
 
             return new PacketUtils.BrandManipulate(customBrand, false);
+
         } catch (Exception exception) {
+
             exception.printStackTrace();
+
         }
 
         return null;
+
     }
+
 }

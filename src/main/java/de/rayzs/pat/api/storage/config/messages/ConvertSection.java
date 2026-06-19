@@ -9,17 +9,23 @@ public class ConvertSection extends ConfigStorage {
     public MultipleMessagesHelper MESSAGE;
 
     public ConvertSection() {
+
         super("convert");
+
     }
 
     public String INVALID_CONVERTER, SUCCESS;
 
     @Override
     public void load() {
+
         super.load();
 
-        INVALID_CONVERTER = new ConfigSectionHelper<String>(this, "converter-not-found", "&cConverter or necessary files could not be found!").getOrSet();
-        SUCCESS = new ConfigSectionHelper<String>(this, "success", "&aSuccessfully converted &e%converter% &ainto the PAT storage.yml!").getOrSet();
+        INVALID_CONVERTER = new ConfigSectionHelper<String>(this, "converter-not-found",
+                "&cConverter or necessary files could not be found!").getOrSet();
+        SUCCESS = new ConfigSectionHelper<String>(this, "success",
+                "&aSuccessfully converted &e%converter% &ainto the PAT storage.yml!").getOrSet();
 
     }
+
 }

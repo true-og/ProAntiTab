@@ -13,10 +13,9 @@ import java.util.*;
 public class AddCommand extends ProCommand {
 
     public AddCommand() {
-        super(
-                "add",
-                ""
-        );
+
+        super("add", "");
+
     }
 
     @Override
@@ -28,29 +27,35 @@ public class AddCommand extends ProCommand {
         boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
 
         if (backend) {
+
             sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
             return true;
-        }
 
+        }
 
         String fullString = String.join(" ", args);
         String command = fullString;
 
         if (!command.startsWith("\"")) {
+
             command = args[0];
+
         } else {
 
             command = command.substring(1);
             int lastIndex = command.indexOf("\"");
 
             if (lastIndex == -1) {
+
                 return false;
+
             }
 
             command = command.substring(0, lastIndex);
 
             fullString = fullString.replace("\"" + command + "\"", ":::");
             args = fullString.split(" ");
+
         }
 
         command = StringUtils.replaceTriggers(command, "", "\\.", "'", "\"");
@@ -62,76 +67,95 @@ public class AddCommand extends ProCommand {
         final int length = args.length;
 
         if (length == 1) {
-            boolean exist = command.contains(" ")
-                    ? Storage.Blacklist.getBlacklist().getCommands().contains(command)
+
+            boolean exist = command.contains(" ") ? Storage.Blacklist.getBlacklist().getCommands().contains(command)
                     : Storage.Blacklist.getBlacklist().isListed(command);
 
             if (!exist) {
+
                 Storage.Blacklist.getBlacklist().add(command).save();
-                if (loadBlacklist) Storage.Blacklist.getBlacklist().load();
+                if (loadBlacklist)
+                    Storage.Blacklist.getBlacklist().load();
 
                 Storage.handleChange();
+
             }
 
-            String message = exist ? Storage.ConfigSections.Messages.BLACKLIST.ADD_FAILED : Storage.ConfigSections.Messages.BLACKLIST.ADD_SUCCESS;
+            String message = exist ? Storage.ConfigSections.Messages.BLACKLIST.ADD_FAILED
+                    : Storage.ConfigSections.Messages.BLACKLIST.ADD_SUCCESS;
             message = StringUtils.replace(message, "%command%", command);
 
             sender.sendMessage(message);
             return true;
+
         }
 
         String groupName = args[1];
         Group group = GroupManager.getGroupByName(groupName);
 
         if (group == null) {
+
             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", groupName));
             return true;
+
         }
 
         GroupBlacklist blacklist = group.getGeneralGroupBlacklist();
         boolean exist = blacklist.getCommands().contains(command);
 
         if (!exist) {
+
             group.add(command);
             Storage.handleChange();
+
         }
 
-        String message = exist ? Storage.ConfigSections.Messages.GROUP.ADD_FAILED : Storage.ConfigSections.Messages.GROUP.ADD_SUCCESS;
+        String message = exist ? Storage.ConfigSections.Messages.GROUP.ADD_FAILED
+                : Storage.ConfigSections.Messages.GROUP.ADD_SUCCESS;
         message = StringUtils.replace(message, "%group%", groupName, "%command%", command);
 
         sender.sendMessage(message);
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
 
         if (args.length == 0 || args.length == 1 && !args[0].startsWith("\"")) {
+
             if (Reflection.isProxyServer())
                 return null;
 
             return Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED
                     ? BukkitLoader.getDisallowedCommands()
                     : BukkitLoader.getAllowedCommands();
+
         }
 
         String fullString = String.join(" ", args);
         String command = fullString;
 
         if (args[0].startsWith("\"")) {
+
             command = command.length() == 1 ? "" : command.substring(1, command.length() - 1);
 
             int lastIndex = command.indexOf("\"");
 
             if (lastIndex == -1) {
+
                 return null;
+
             }
 
             command = command.substring(0, lastIndex);
             args = Arrays.copyOfRange(args, command.split(" ").length - 1, args.length);
+
         }
 
         final int length = args.length;
         return length == 2 ? GroupManager.getGroupNames() : null;
+
     }
+
 }

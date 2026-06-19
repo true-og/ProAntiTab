@@ -23,35 +23,43 @@ public class CommandsCache {
     private boolean change = false;
 
     public void handleCommands(List<String> commands) {
-        if (change || !isOutdated(commands)) 
+
+        if (change || !isOutdated(commands))
             return;
 
         LinkedList<String> tmpFilteredCommands = new LinkedList<>();
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
+
             command = StringUtils.getFirstArg(command);
 
             Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
             if (type != Storage.Blacklist.BlockType.BOTH && type != Storage.Blacklist.BlockType.TAB)
                 continue;
-            
+
             if (isFilterListAvailable()) {
-                if (filteredCommands.contains(command)) 
+
+                if (filteredCommands.contains(command))
                     continue;
 
                 if (!Storage.Blacklist.isBlockedTab(command)) {
+
                     filteredCommands.add(command);
+
                 }
+
             }
 
         }
 
         filteredCommands = tmpFilteredCommands;
         change = true;
+
     }
 
     public void handleCommands(List<String> commands, String server) {
+
         if (!isOutdated(commands))
             return;
 
@@ -61,6 +69,7 @@ public class CommandsCache {
 
         final int length = allCommands.size();
         for (int i = 0; i < length; i++) {
+
             if (i >= tmpAllCommands.size())
                 break;
 
@@ -71,54 +80,79 @@ public class CommandsCache {
                 continue;
 
             if (isFilterListAvailable()) {
+
                 if (filteredCommands.contains(command))
                     continue;
 
                 if (!Storage.Blacklist.isBlockedTab(command, server))
                     tmpFilteredCommands.add(command);
+
             }
+
         }
 
         filteredCommands = tmpFilteredCommands;
+
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, CommandSender sender, List<Group> groups) {
+    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, CommandSender sender,
+            List<Group> groups)
+    {
+
         return getPlayerCommands(unfilteredCommands, sender, groups, null);
+
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, CommandSender sender, List<Group> groups, String serverName) {
+    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, CommandSender sender,
+            List<Group> groups, String serverName)
+    {
+
         List<String> playerCommands = new LinkedList<>(unfilteredCommands);
         List<String> localFilteredCommands = filteredCommands == null ? null : new LinkedList<>();
 
         if (localFilteredCommands == null)
             return playerCommands;
 
-
         final int max = filteredCommands.size();
         for (int i = 0; i < max; i++) {
+
             try {
+
                 String command = filteredCommands.get(i);
                 localFilteredCommands.add(command);
+
             } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-                Logger.warning("Array is out of bounds " + i + "/" + max + "! " + indexOutOfBoundsException.getMessage());
+
+                Logger.warning(
+                        "Array is out of bounds " + i + "/" + max + "! " + indexOutOfBoundsException.getMessage());
                 break;
+
             }
+
         }
 
-
         if (!PermissionUtil.hasBypassPermission(sender)) {
+
             boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender);
 
             playerCommands.removeIf(command -> {
-                if (!hasNamespaceBypass && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)) {
+
+                if (!hasNamespaceBypass
+                        && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command))
+                {
+
                     return true;
+
                 }
 
                 if (localFilteredCommands.contains(command)) {
+
                     return false;
+
                 }
 
                 return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, serverName);
+
             });
 
         }
@@ -126,6 +160,7 @@ public class CommandsCache {
         PATEventHandler.callUpdatePlayerCommandsEvents(sender, playerCommands, serverName != null);
 
         return playerCommands.stream().map(command -> {
+
             command = StringUtils.getFirstArg(command);
 
             Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
@@ -133,27 +168,37 @@ public class CommandsCache {
                 return command;
 
             return Storage.Blacklist.BlockTypeFetcher.modify(command, type);
+
         }).toList();
 
     }
 
     public boolean isFilterListAvailable() {
+
         return this.filteredCommands != null;
+
     }
 
     public void updateChangeState() {
+
         change = false;
+
     }
 
     public void reset() {
+
         // Removed to reset the change state. Experimental change though
         // if(change) return;
         // Prob. gonna change it to: if (CONNECTED_TO_BUNGEE && change) return;
         updateChangeState();
         filteredCommands = null;
+
     }
 
     public boolean isOutdated(List<String> commands) {
+
         return filteredCommands == null || !ArrayUtils.compareStringArrays(commands, allCommands);
+
     }
+
 }

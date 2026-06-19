@@ -39,8 +39,7 @@ import java.util.stream.Collectors;
 
 public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
-    private static List<String> commands = new ArrayList<>(),
-            allowedCommands = new ArrayList<>(),
+    private static List<String> commands = new ArrayList<>(), allowedCommands = new ArrayList<>(),
             disallowedCommands = new ArrayList<>();
 
     private static Plugin plugin;
@@ -53,19 +52,24 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     @Override
     public void onLoad() {
+
         Configurator.createResourcedFile("files\\bukkit-config.yml", "config.yml", false);
         Configurator.createResourcedFile("files\\bukkit-storage.yml", "storage.yml", false);
         Configurator.createResourcedFile("files\\bukkit-placeholders.yml", "placeholders.yml", false);
         Configurator.createResourcedFile("files\\bukkit-custom-responses.yml", "custom-responses.yml", false);
+
     }
 
     @Override
     public void onEnable() {
+
         plugin = this;
         logger = getLogger();
 
         for (OfflinePlayer offlinePlayerName : Bukkit.getOfflinePlayers()) {
+
             offlinePlayerNames.add(offlinePlayerName.getName());
+
         }
 
         loadCommandMap();
@@ -90,15 +94,20 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         PluginManager manager = getServer().getPluginManager();
 
         if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+
             GroupManager.initialize();
             BukkitPacketAnalyzer.injectAll();
-        } else BackendUpdater.handle();
+
+        } else
+            BackendUpdater.handle();
 
         manager.registerEvents(new BukkitPlayerListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
 
         if (Reflection.isAtLeast(1, 13)) {
+
             manager.registerEvents(new BukkitAntiTabListener(), this);
+
         }
 
         if (Reflection.isPaper() && Reflection.isAtLeast(1, 12))
@@ -110,18 +119,26 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         Storage.PLUGIN_OBJECT = this;
 
         if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
+
             LuckPermsAdapter.initialize();
             Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
+
         } else {
+
             final Plugin groupManagerPlugin = getServer().getPluginManager().getPlugin("GroupManager");
             if (groupManagerPlugin != null) {
+
                 GroupManagerAdapter.initialize(groupManagerPlugin);
                 Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
+
             }
+
         }
 
         if (getServer().getPluginManager().getPlugin("ViaVersion") != null) {
+
             ViaVersionAdapter.initialize();
+
         }
 
         Storage.broadcastPermissionsPluginNotice();
@@ -135,140 +152,194 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         Communicator.initialize(new BukkitClient());
 
         PATScheduler.createScheduler(() -> {
+
             Storage.reload();
             loadAllCommands();
+
         });
+
     }
 
     @Override
     public void onDisable() {
+
         BackendUpdater.stop();
         BukkitPacketAnalyzer.uninjectAll();
         MessageTranslator.closeAudiences();
+
     }
 
     public void registerCommand(String... commands) {
+
         BukkitCommand command = new BukkitCommand();
         for (String commandName : commands) {
+
             PluginCommand pluginCommand = getCommand(commandName);
             pluginCommand.setExecutor(command);
             pluginCommand.setTabCompleter(command);
+
         }
+
     }
 
     @Override
     public void handleReload() {
+
         loadAllCommands();
+
     }
 
     @Override
     public boolean doesCommandExist(String command) {
+
         if (commandsMap == null)
             return false;
 
         loadAllCommands();
 
         return getAllCommands().contains(command);
+
     }
 
     @Override
     public Object getConsoleSender() {
+
         return Bukkit.getConsoleSender();
+
     }
 
     @Override
     public Object getPlayerObjByName(String name) {
+
         return Bukkit.getPlayer(name);
+
     }
 
     @Override
     public Object getPlayerObjByUUID(UUID uuid) {
+
         return Bukkit.getPlayer(uuid);
+
     }
 
     @Override
-    public void updateCommandCache() {}
+    public void updateCommandCache() {
+
+    }
 
     @Override
     public HashMap<String, CommandsCache> getCommandsCacheMap() {
+
         return null;
+
     }
 
     @Override
     public boolean isPlayerOnline(String playerName) {
+
         return Bukkit.getPlayer(playerName) != null;
+
     }
 
     @Override
     public boolean doesPlayerExist(String playerName) {
+
         return isPlayerOnline(playerName) || ArrayUtils.containsIgnoreCase(getPlayerNames(), playerName);
+
     }
 
     @Override
     public String getPlayerServerName(UUID uuid) {
+
         final Player player = Bukkit.getPlayer(uuid);
-        if (player == null) { return null; }
+        if (player == null) {
+
+            return null;
+
+        }
 
         return player.getWorld().getName();
+
     }
 
     @Override
     public List<UUID> getPlayerIdsByServer(String server) {
+
         return null;
+
     }
 
     @Override
     public List<String> getOnlinePlayerNames(String serverName) {
+
         return getOnlinePlayerNames();
+
     }
 
     @Override
     public List<UUID> getPlayerIds() {
+
         return Bukkit.getOnlinePlayers().stream().map(Entity::getUniqueId).collect(Collectors.toList());
+
     }
 
     @Override
     public List<String> getOnlinePlayerNames() {
+
         return new ArrayList<>(Bukkit.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
+
     }
 
     @Override
     public List<String> getOfflinePlayerNames() {
+
         return offlinePlayerNames;
+
     }
 
     @Override
     public List<String> getPlayerNames() {
+
         List<String> playerNames = new ArrayList<>(offlinePlayerNames);
 
         playerNames.addAll(getOnlinePlayerNames());
 
         return playerNames;
+
     }
 
     @Override
     public String getNameByUUID(UUID uuid) {
+
         Player player = Bukkit.getPlayer(uuid);
         return player != null ? player.getName() : "";
+
     }
 
     @Override
     public UUID getUUIDByName(String playerName) {
+
         Player player = Bukkit.getPlayer(playerName);
         return player != null ? player.getUniqueId() : null;
+
     }
 
     @Override
     public List<String> getServerNames() {
+
         return List.of();
+
     }
 
     @Override
     public void delayedPermissionsReload() {
+
         PATScheduler.createScheduler(PermissionUtil::reloadPermissions, 40);
+
     }
 
     public void startUpdaterTask() {
+
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED)
             return;
 
@@ -278,170 +349,240 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
                 updaterTask.cancelTask();
 
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
+
     }
 
     public static void handleNotificationPacket(CommunicationPackets.Proxy2Backend.NotificationPacket packet) {
-        if (!Storage.SEND_CONSOLE_NOTIFICATION) { return; }
+
+        if (!Storage.SEND_CONSOLE_NOTIFICATION) {
+
+            return;
+
+        }
 
         final Player player = Bukkit.getPlayer(packet.playerId());
         if (player == null) {
+
             return;
+
         }
 
         final List<String> notificationMessage = MessageTranslator.replaceMessageList(
-                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
-                "%player%", player.getName(),
-                "%command%", packet.command(),
-                "%server%", Storage.SERVER_NAME,
-                "%world%", player.getWorld().getName());
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%",
+                packet.command(), "%server%", Storage.SERVER_NAME, "%world%", player.getWorld().getName());
 
         Logger.info(notificationMessage);
+
     }
 
     public static void handleUpdateCommandsPacket(CommunicationPackets.Proxy2Backend.UpdatePacket packet) {
+
         if (Reflection.isBefore(1, 13)) {
+
             return;
+
         }
 
         PATScheduler.createScheduler(() -> {
+
             if (packet.forEveryone()) {
+
                 BukkitAntiTabListener.updateCommands();
                 return;
+
             }
 
             Player player = Bukkit.getPlayer(packet.playerId());
             if (player != null) {
+
                 BukkitAntiTabListener.updateCommands(player);
+
             }
 
         });
+
     }
 
-    public static void handlePlayerExecuteCommandPacket(CommunicationPackets.Proxy2Backend.ExecutePlayerCommandPacket packet) {
-        if (isP2BDisabled()) return;
+    public static void handlePlayerExecuteCommandPacket(
+            CommunicationPackets.Proxy2Backend.ExecutePlayerCommandPacket packet)
+    {
+
+        if (isP2BDisabled())
+            return;
 
         final Player player = Bukkit.getPlayer(packet.playerId());
-        if (player == null) return;
+        if (player == null)
+            return;
 
         PATScheduler.execute(() -> Bukkit.dispatchCommand(player, packet.command()), player);
+
     }
 
-    public static void handleConsoleExecuteCommandPacket(CommunicationPackets.Proxy2Backend.ExecuteConsoleCommandPacket packet) {
-        if (isP2BDisabled()) return;
+    public static void handleConsoleExecuteCommandPacket(
+            CommunicationPackets.Proxy2Backend.ExecuteConsoleCommandPacket packet)
+    {
+
+        if (isP2BDisabled())
+            return;
 
         PATScheduler.execute(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packet.command()), null);
+
     }
 
     public static void handleConsoleMessagePacket(CommunicationPackets.Proxy2Backend.ConsoleMessagePacket packet) {
-        if (isP2BDisabled()) return;
+
+        if (isP2BDisabled())
+            return;
 
         Logger.info(packet.message());
+
     }
 
     private static boolean isP2BDisabled() {
+
         if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ALLOW_P2B_ACTIONS) {
+
             Logger.warning("P2B actions are currently disabled! You need to enable them manually.");
-            Logger.warning("For that, go to your 'plugins/ProAntiTab/config.yml' file and enable 'handle-through-proxy -> allow-p2b-actions'.");
+            Logger.warning(
+                    "For that, go to your 'plugins/ProAntiTab/config.yml' file and enable 'handle-through-proxy -> allow-p2b-actions'.");
             return true;
+
         }
 
         return false;
+
     }
 
     public static void handleDataSyncPacket(CommunicationPackets.Proxy2Backend.DataSyncPacket packet) {
+
         Storage.ConfigSections.Messages.PREFIX.PREFIX = packet.messages().prefix();
         Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.ENABLED = packet.autoLowerCase().enabled();
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = packet.unknownCommand().enabled();
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = packet.unknownCommand().message();
 
         PATEventHandler.callReceiveSyncEvents(packet);
+
     }
 
     public static List<String> getAllCommands() {
+
         return new ArrayList<>(commands);
+
     }
 
     public static List<String> getAllowedCommands() {
+
         return new ArrayList<>(allowedCommands);
+
     }
 
     public static List<String> getDisallowedCommands() {
+
         return disallowedCommands;
+
     }
 
     @Override
     public List<String> getPluginNames(String format) {
+
         List<String> pluginNames = new ArrayList<>();
 
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+
             PluginDescriptionFile description = plugin.getDescription();
 
-            pluginNames.add(
-                    format.replace("%n", description.getName())
-                            .replace("%v", description.getVersion())
-            );
+            pluginNames.add(format.replace("%n", description.getName()).replace("%v", description.getVersion()));
+
         }
 
         return pluginNames;
+
     }
 
     @Override
     public List<String> getAllCommands(boolean useColons) {
+
         List<String> commands = new ArrayList<>();
 
         for (Map.Entry<String, Command> entry : BukkitLoader.getCommandsMap().entrySet()) {
+
             if (entry.getKey().toLowerCase().contains(":")) {
+
                 String command = entry.getKey().substring(entry.getKey().lastIndexOf(":") + 1);
 
                 commands.add(command);
 
                 if (useColons) {
+
                     commands.add(entry.getKey());
+
                 }
+
             }
+
         }
 
         return commands;
+
     }
 
     @Override
     public List<String> getPluginCommands(String pluginName, boolean useColons) {
+
         List<String> commands = new ArrayList<>();
 
-        if (pluginName.isBlank()) return commands;
+        if (pluginName.isBlank())
+            return commands;
 
         pluginName = pluginName.toLowerCase();
 
         for (Map.Entry<String, Command> entry : BukkitLoader.getCommandsMap().entrySet()) {
+
             if (entry.getKey().toLowerCase().startsWith(pluginName + ":")) {
+
                 String command = entry.getKey().substring(pluginName.length() + 1);
 
                 commands.add(command);
 
                 if (useColons) {
+
                     commands.add(entry.getKey());
+
                 }
+
             }
+
         }
 
         return commands;
+
     }
 
     private void loadCommandMap() {
+
         try {
+
             if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
+
                 Field commandMapField = SimplePluginManager.class.getDeclaredField("commandMap");
                 commandMapField.setAccessible(true);
                 SimpleCommandMap simpleCommandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getPluginManager());
                 Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
                 knownCommandsField.setAccessible(true);
                 commandsMap = (Map<String, Command>) knownCommandsField.get(simpleCommandMap);
+
             }
-        } catch (Throwable ignored) { }
+
+        } catch (Throwable ignored) {
+
+        }
 
         if (commandsMap == null) {
+
             Logger.warning("Failed to get server commands!");
+
         }
+
     }
 
     private void loadAllCommands() {
@@ -452,54 +593,70 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         List<String> result = new ArrayList<>();
 
         if (commandsMap == null) {
-            result.addAll(
-                    Bukkit.getHelpMap().getHelpTopics().stream()
-                    .map(topic -> {
-                        String name = topic.getName();
 
-                        if (name.startsWith("/"))
-                            name = name.substring(1);
+            result.addAll(Bukkit.getHelpMap().getHelpTopics().stream().map(topic -> {
 
-                        return name;
-                    }).toList()
-            );
+                String name = topic.getName();
+
+                if (name.startsWith("/"))
+                    name = name.substring(1);
+
+                return name;
+
+            }).toList());
 
             return;
+
         }
 
         commandsMap.entrySet().forEach(entry -> {
+
             String key = entry.getKey();
             Command command = entry.getValue();
 
             result.add(key);
 
             if (!command.getAliases().isEmpty()) {
+
                 result.addAll(command.getAliases());
+
             }
+
         });
 
         boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
         List<String> allowedCommands = new ArrayList<>(result).stream().filter(command -> {
+
             boolean contains = Storage.Blacklist.getBlacklist().getCommands().contains(command);
             return turn == contains;
+
         }).toList();
 
         lastCommandsLoad = System.currentTimeMillis();
 
         BukkitLoader.commands = result;
         BukkitLoader.allowedCommands = allowedCommands;
-        BukkitLoader.disallowedCommands = commands.stream().filter(command -> !allowedCommands.contains(command)).toList();
+        BukkitLoader.disallowedCommands = commands.stream().filter(command -> !allowedCommands.contains(command))
+                .toList();
+
     }
 
     public static Map<String, Command> getCommandsMap() {
+
         return commandsMap;
+
     }
 
     public static Plugin getPlugin() {
+
         return plugin;
+
     }
 
     public static java.util.logging.Logger getPluginLogger() {
+
         return logger;
+
     }
+
 }

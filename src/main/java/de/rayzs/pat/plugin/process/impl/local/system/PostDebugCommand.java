@@ -9,27 +9,35 @@ import java.util.*;
 public class PostDebugCommand extends ProCommand {
 
     public PostDebugCommand() {
-        super(
-                "postdebug",
-                ""
-        );
+
+        super("postdebug", "");
+
     }
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
 
         try {
-            sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.SUCCESS.replace("%link%", Objects.requireNonNull(Logger.post())));
+
+            sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.SUCCESS.replace("%link%",
+                    Objects.requireNonNull(Logger.post())));
+
         } catch (Exception exception) {
+
             sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.FAILED);
             exception.printStackTrace();
+
         }
 
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
+
         return List.of();
+
     }
+
 }

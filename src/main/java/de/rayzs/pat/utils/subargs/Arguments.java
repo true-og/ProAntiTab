@@ -12,21 +12,29 @@ public class Arguments {
     public ArgumentSource TAB_ARGUMENTS = new ArgumentSource();
 
     public List<String> getResultChat(String input) {
+
         return CHAT_ARGUMENTS.getGeneralArgument().getResult(input);
+
     }
 
     public List<String> getResultTab(String input) {
+
         return TAB_ARGUMENTS.getGeneralArgument().getResult(input);
+
     }
 
     public void buildArgumentStacks(String input) {
+
         Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
 
         if (type != Storage.Blacklist.BlockType.NEGATE) {
+
             input = Storage.Blacklist.BlockTypeFetcher.modify(input, type);
+
         }
 
         switch (type) {
+
             case TAB:
                 TAB_ARGUMENTS.getGeneralArgument().buildArgumentStacks(input);
                 break;
@@ -35,15 +43,21 @@ public class Arguments {
                 CHAT_ARGUMENTS.getGeneralArgument().buildArgumentStacks(input);
                 break;
 
-            case BOTH: default:
+            case BOTH:
+            default:
                 CHAT_ARGUMENTS.buildArguments(input);
                 TAB_ARGUMENTS.buildArguments(input);
                 break;
+
         }
+
     }
 
     public void clearArguments() {
+
         CHAT_ARGUMENTS.clearArguments();
         TAB_ARGUMENTS.clearArguments();
+
     }
+
 }

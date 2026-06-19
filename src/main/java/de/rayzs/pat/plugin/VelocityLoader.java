@@ -32,22 +32,13 @@ import com.velocitypowered.api.event.*;
 import de.rayzs.pat.utils.Reflection;
 import java.util.concurrent.TimeUnit;
 
-
 import com.google.inject.Inject;
 import de.rayzs.pat.utils.response.action.ActionHandler;
 
 import java.util.*;
 
-@Plugin(name = "ProAntiTab",
-id = "proantitab",
-version = "2.3.2",
-authors = "Rayzs_YT",
-description = "Hides more than just your plugins.",
-url = "https://www.rayzs.de/products/proantitab/page",
-dependencies = {
-        @Dependency(id = "luckperms", optional = true),
-        @Dependency(id = "papiproxybridge", optional = true)
-})
+@Plugin(name = "ProAntiTab", id = "proantitab", version = "2.3.2", authors = "Rayzs_YT", description = "Hides more than just your plugins.", url = "https://www.rayzs.de/products/proantitab/page", dependencies = {
+        @Dependency(id = "luckperms", optional = true), @Dependency(id = "papiproxybridge", optional = true) })
 public class VelocityLoader implements PluginLoader {
 
     private static VelocityLoader instance;
@@ -63,16 +54,19 @@ public class VelocityLoader implements PluginLoader {
 
     @Inject
     public VelocityLoader(ProxyServer server, org.slf4j.Logger logger, VelocityMetrics.Factory metricsFactory) {
+
         VelocityLoader.instance = this;
         VelocityLoader.server = server;
         VelocityLoader.logger = logger;
 
         this.manager = server.getEventManager();
         this.metricsFactory = metricsFactory;
+
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+
         PluginContainer pluginContainer = server.getPluginManager().getPlugin("proantitab").get();
 
         Configurator.createResourcedFile("files\\proxy-config.yml", "config.yml", false);
@@ -109,8 +103,10 @@ public class VelocityLoader implements PluginLoader {
             LuckPermsAdapter.initialize();
 
         if (server.getPluginManager().getPlugin("papiproxybridge").isPresent()) {
+
             Storage.USE_PAPIPROXYBRIDGE = true;
             Logger.info("Successfully hooked into PAPIProxyBridge!");
+
         }
 
         Storage.broadcastPermissionsPluginNotice();
@@ -124,86 +120,119 @@ public class VelocityLoader implements PluginLoader {
         Communicator.initialize(new VelocityClient());
 
         VelocityPacketAnalyzer.injectAll();
+
     }
 
     public static org.slf4j.Logger getPluginLogger() {
+
         return logger;
+
     }
 
     @Override
     public void delayedPermissionsReload() {
+
         server.getScheduler().buildTask(VelocityLoader.instance, () -> {
+
             PermissionUtil.reloadPermissions();
             Storage.getLoader().updateCommandCache();
+
         }).delay(1, TimeUnit.SECONDS).schedule();
+
     }
 
     public static void delayedPlayerReload(UUID uuid) {
+
         server.getScheduler().buildTask(VelocityLoader.instance, () -> {
+
             String serverName = Storage.getLoader().getPlayerServerName(uuid);
             List<String> commands = new ArrayList<>(SubArguments.getServerCommands(serverName));
 
             commands.addAll(SubArguments.getGroupCommands(uuid, serverName));
 
             PATEventHandler.callUpdatePlayerCommandsEvents(uuid, commands, true);
+
         }).delay(1, TimeUnit.SECONDS).schedule();
+
     }
 
     @Override
-    public void handleReload() {}
+    public void handleReload() {
+
+    }
 
     @Override
     public boolean doesCommandExist(String command) {
+
         return false;
+
     }
 
     @Override
     public List<String> getAllCommands(boolean useColons) {
+
         return List.of();
+
     }
 
     @Override
     public Object getConsoleSender() {
+
         return server.getConsoleCommandSource();
+
     }
 
     @Override
     public Object getPlayerObjByName(String name) {
+
         return server.getPlayer(name).orElse(null);
+
     }
 
     @Override
     public Object getPlayerObjByUUID(UUID uuid) {
+
         return server.getPlayer(uuid).orElse(null);
+
     }
 
     @Override
     public void updateCommandCache() {
+
         new ArrayList<>(commandsCacheMap.values()).forEach(CommandsCache::reset);
+
     }
 
     @Override
     public HashMap<String, CommandsCache> getCommandsCacheMap() {
+
         return commandsCacheMap;
+
     }
 
     @Override
     public boolean isPlayerOnline(String playerName) {
+
         return server.getPlayer(playerName).isPresent();
+
     }
 
     @Override
     public boolean doesPlayerExist(String playerName) {
+
         return isPlayerOnline(playerName);
+
     }
 
     @Override
     public List<UUID> getPlayerIdsByServer(String serverName) {
+
         List<UUID> uuids = new ArrayList<>();
 
-        getServerNames().stream()
-                .filter(originServerName -> Storage.isServer(serverName, originServerName))
-                .forEach(originServerName -> {
+        getServerNames().stream().filter(originServerName -> Storage.isServer(serverName, originServerName))
+                .forEach(originServerName ->
+                {
+
                     Optional<RegisteredServer> optionalRegServerInfo = server.getServer(serverName);
 
                     if (optionalRegServerInfo.isEmpty())
@@ -211,16 +240,21 @@ public class VelocityLoader implements PluginLoader {
 
                     RegisteredServer regServerInfo = optionalRegServerInfo.get();
                     uuids.addAll(regServerInfo.getPlayersConnected().stream().map(Player::getUniqueId).toList());
+
                 });
 
         return uuids;
+
     }
 
     @Override
     public String getPlayerServerName(UUID uuid) {
+
         final String cachedServerName = Storage.getCachedPlayerServername(uuid);
         if (cachedServerName != null) {
+
             return cachedServerName;
+
         }
 
         Optional<Player> optPlayer = server.getPlayer(uuid);
@@ -232,103 +266,135 @@ public class VelocityLoader implements PluginLoader {
         Optional<ServerConnection> optConnection = player.getCurrentServer();
 
         if (optConnection.isEmpty()) {
+
             return null;
+
         }
 
         ServerConnection connection = optConnection.get();
         return connection.getServer().getServerInfo().getName();
+
     }
 
     @Override
     public List<UUID> getPlayerIds() {
+
         return server.getAllPlayers().stream().map(Player::getUniqueId).toList();
+
     }
 
     @Override
     public List<String> getOnlinePlayerNames(String serverName) {
-        return server.getAllPlayers().stream()
-                .filter(player -> {
-                    Optional<ServerConnection> optConnection = player.getCurrentServer();
 
-                    if (optConnection.isEmpty())
-                        return false;
+        return server.getAllPlayers().stream().filter(player -> {
 
-                    ServerConnection connection = optConnection.get();
-                    return connection.getServer().getServerInfo().getName().equalsIgnoreCase(serverName);
+            Optional<ServerConnection> optConnection = player.getCurrentServer();
 
-                }).map(Player::getUsername).toList();
+            if (optConnection.isEmpty())
+                return false;
+
+            ServerConnection connection = optConnection.get();
+            return connection.getServer().getServerInfo().getName().equalsIgnoreCase(serverName);
+
+        }).map(Player::getUsername).toList();
+
     }
 
     @Override
     public List<String> getOnlinePlayerNames() {
+
         return server.getAllPlayers().stream().map(Player::getUsername).toList();
+
     }
 
     @Override
     public List<String> getOfflinePlayerNames() {
+
         return server.getAllPlayers().stream().map(Player::getUsername).toList();
+
     }
 
     public List<String> getPlayerNames() {
+
         return server.getAllPlayers().stream().map(Player::getUsername).toList();
+
     }
 
     @Override
     public String getNameByUUID(UUID uuid) {
+
         Player player = server.getPlayer(uuid).orElse(null);
         return player != null ? player.getUsername() : "";
+
     }
 
     @Override
     public UUID getUUIDByName(String playerName) {
+
         Player player = server.getPlayer(playerName).orElse(null);
         return player != null ? player.getUniqueId() : null;
+
     }
 
     @Override
     public List<String> getServerNames() {
-        return new ArrayList<>(server.getAllServers().stream().map(registeredServer -> registeredServer.getServerInfo().getName()).toList());
+
+        return new ArrayList<>(server.getAllServers().stream()
+                .map(registeredServer -> registeredServer.getServerInfo().getName()).toList());
+
     }
 
     @Override
     public List<String> getPluginNames(String format) {
+
         List<String> pluginNames = new ArrayList<>();
         for (PluginContainer plugin : server.getPluginManager().getPlugins()) {
+
             PluginDescription description = plugin.getDescription();
 
             String pluginName = description.getName().orElse("/");
             String version = description.getVersion().orElse("/");
 
-            pluginNames.add(
-                    format.replace("%n", pluginName)
-                            .replace("%v", version)
-            );
+            pluginNames.add(format.replace("%n", pluginName).replace("%v", version));
+
         }
 
         return pluginNames;
+
     }
 
     @Override
     public List<String> getPluginCommands(String pluginName, boolean useColons) {
+
         return List.of();
+
     }
 
     public void startUpdaterTask() {
-        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
+
+        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED)
+            return;
 
         updaterTask = server.getScheduler().buildTask(this, () -> {
 
             if (VersionComparer.get().computeComparison())
                 updaterTask.cancel();
 
-        }).delay(1, TimeUnit.SECONDS).repeat(Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.SECONDS).schedule();
+        }).delay(1, TimeUnit.SECONDS).repeat(Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.SECONDS)
+                .schedule();
+
     }
 
     public static ProxyServer getServer() {
+
         return server;
+
     }
 
     public static VelocityLoader getInstance() {
+
         return instance;
+
     }
+
 }

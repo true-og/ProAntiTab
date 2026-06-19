@@ -25,7 +25,8 @@ public class BungeeAntiTabListener implements Listener {
     @EventHandler
     public void onTabCompleteResponse(TabCompleteResponseEvent event) {
 
-        if(!(event.getReceiver() instanceof ProxiedPlayer)) return;
+        if (!(event.getReceiver() instanceof ProxiedPlayer))
+            return;
 
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
         CommandSender sender = CommandSenderHandler.from(player);
@@ -36,11 +37,15 @@ public class BungeeAntiTabListener implements Listener {
         String rawCursor = BungeePacketAnalyzer.getPlayerInput(player);
 
         if (rawCursor == null) {
+
             return;
+
         }
 
         if (!rawCursor.startsWith("/")) {
+
             return;
+
         }
 
         String cursor = rawCursor.substring(1);
@@ -54,8 +59,6 @@ public class BungeeAntiTabListener implements Listener {
         if (PermissionUtil.hasBypassPermission(sender))
             return;
 
-
-
         final List<Group> groups = GroupManager.getPlayerGroups(sender);
         final boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender);
         final boolean spaces = cursor.contains(" ");
@@ -63,51 +66,80 @@ public class BungeeAntiTabListener implements Listener {
         boolean cancelsBeforeHand = false;
 
         if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(cursor) && !doesBypassNamespace) {
+
             cancelsBeforeHand = true;
+
         }
 
         if (!cancelsBeforeHand && !cursor.isEmpty()) {
-            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.getFirstArg(cursor), serverName);
+
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.getFirstArg(cursor),
+                    serverName);
+
         }
 
         if (!cancelsBeforeHand) {
-            cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(cursor) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(cursor);
+
+            cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(cursor)
+                    || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(cursor);
+
         }
 
         if (spaces) {
+
             if (cancelsBeforeHand) {
+
                 event.getSuggestions().clear();
                 return;
+
             }
 
-            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawCursor, new ArrayList<>(event.getSuggestions()));
+            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(
+                    player.getUniqueId(), rawCursor, new ArrayList<>(event.getSuggestions()));
 
             if (filteredTabCompletionEvent.isCancelled()) {
+
                 event.getSuggestions().clear();
+
             } else {
+
                 event.getSuggestions().removeIf(s -> !filteredTabCompletionEvent.getCompletion().contains(s));
+
             }
 
             return;
+
         }
 
         event.getSuggestions().removeIf(s -> {
+
             String cpy = s;
             if (cpy.startsWith("/")) {
+
                 cpy = cpy.substring(1);
+
             }
 
-            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(cpy) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(cpy)) {
+            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(cpy)
+                    || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(cpy))
+            {
+
                 return false;
+
             }
 
             return !Storage.Blacklist.canPlayerAccessTab(sender, groups, cpy, serverName);
+
         });
+
     }
 
     @EventHandler
     public void onTabComplete(TabCompleteEvent event) {
+
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
         BungeePacketAnalyzer.setPlayerInput(player, event.getCursor());
+
     }
+
 }

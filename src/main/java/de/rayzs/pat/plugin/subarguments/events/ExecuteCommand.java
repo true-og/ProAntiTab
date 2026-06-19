@@ -18,15 +18,11 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
     @Override
     public void handle(ExecuteCommandEvent event) {
-        String command = event.getCommand();
-        command = command.startsWith("/")
-                ? command.substring(1)
-                : command;
 
-        final String displayCommand = StringUtils.replaceTriggers(
-                command, "",
-                "\\", "<", ">", "&"
-        );
+        String command = event.getCommand();
+        command = command.startsWith("/") ? command.substring(1) : command;
+
+        final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
         CommandSender sender = CommandSenderHandler.from(event.getSenderObj());
 
@@ -38,14 +34,16 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         String playerName = sender.getName();
 
         if (isBlocked(sender, command)) {
+
             event.setBlocked(true);
             event.setCancelled(true);
 
             MessageTranslator.send(event.getSenderObj(),
-                    ResponseHandler.getResponse(uuid, playerName, serverName, event.getCommand()),
-                    "%command%", displayCommand);
+                    ResponseHandler.getResponse(uuid, playerName, serverName, event.getCommand()), "%command%",
+                    displayCommand);
 
             return;
+
         }
 
         if (!event.isBlocked())
@@ -53,16 +51,17 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
         event.setCancelled(true);
 
-        MessageTranslator.send(
-                event.getSenderObj(),
-                ResponseHandler.getResponse(uuid, playerName, serverName, event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()),
-                "%command%", StringUtils.getFirstArg(displayCommand)
-        );
+        MessageTranslator.send(event.getSenderObj(),
+                ResponseHandler.getResponse(uuid, playerName, serverName, event.getCommand(),
+                        Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()),
+                "%command%", StringUtils.getFirstArg(displayCommand));
 
     }
 
     private boolean isBlocked(CommandSender sender, String command) {
-        final Arguments arguments = SubArguments.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Arguments.ARGUMENTS);
+
+        final Arguments arguments = SubArguments.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(),
+                Arguments.ARGUMENTS);
         final List<String> commands = new ArrayList<>(arguments.CHAT_ARGUMENTS.getGeneralArgument().getInputs());
         final String firstArgument = StringUtils.getFirstArg(command);
 
@@ -70,72 +69,92 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         final boolean blockBaseCommand = commands.contains(blockBaseCommandStr);
 
         if (!command.contains(" ")) {
+
             return blockBaseCommand;
+
         }
 
         if (blockBaseCommand) {
+
             commands.remove(blockBaseCommandStr);
+
         }
 
-
-        boolean inCommands = commands.stream().anyMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(firstArgument));
-        boolean negationInCommands = commands.stream().anyMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase("!" + firstArgument));
-
+        boolean inCommands = commands.stream()
+                .anyMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(firstArgument));
+        boolean negationInCommands = commands.stream()
+                .anyMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase("!" + firstArgument));
 
         if (!inCommands && !negationInCommands) {
-            return false;
-        }
 
+            return false;
+
+        }
 
         boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
         boolean listed = isListed(command, commands);
         boolean negated = isListed("!" + command, commands);
 
         if (!listed && !inCommands) {
+
             listed = turn;
+
         }
 
         if (negated) {
+
             listed = !turn;
+
         }
 
         return turn != listed;
+
     }
 
     private boolean isListed(String command, List<String> commands) {
+
         boolean listed = false;
 
         final String unmodifiable = command;
         final String firstArgUnmodifiable = StringUtils.getFirstArg(unmodifiable);
 
         commands = commands.stream().map(c -> {
+
             if (c.contains("%hidden")) {
+
                 return c.replace("%hidden_", "%");
+
             }
 
             return c;
+
         }).toList();
 
-        List<String> placeholderCommands = commands.stream().filter(s ->
-                StringUtils.getFirstArg(s).equalsIgnoreCase(firstArgUnmodifiable) && s.contains("%")
-        ).toList();
+        List<String> placeholderCommands = commands.stream()
+                .filter(s -> StringUtils.getFirstArg(s).equalsIgnoreCase(firstArgUnmodifiable) && s.contains("%"))
+                .toList();
 
         if (!placeholderCommands.isEmpty()) {
+
             command = SubArguments.replacePlaceholders(command);
+
         }
 
         String cpyCommand;
         for (String c : commands) {
+
             cpyCommand = command;
 
             if (listed)
                 break;
 
             if (cpyCommand.contains("%both_players%")) {
+
                 if (c.contains("%online_players%"))
                     cpyCommand = StringUtils.replace(command, "%both_players%", "%online_players%");
                 if (c.contains("%players%"))
                     cpyCommand = StringUtils.replace(command, "%both_players%", "%players%");
+
             }
 
             if (c.contains("%offline_players%")) {
@@ -144,34 +163,48 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                 final String[] cpyCommandSplit = cpyCommand.split(" ");
 
                 for (int i = 0; i < cSplit.length; i++) {
+
                     if (i >= cpyCommandSplit.length) {
+
                         break;
+
                     }
 
                     if (cSplit[i].equals("%offline_players%") && !cpyCommandSplit[i].endsWith("players%")) {
+
                         cpyCommandSplit[i] = "%offline_players%";
+
                     }
+
                 }
 
                 cpyCommand = String.join(" ", cpyCommandSplit);
+
             }
 
             boolean ends = c.endsWith("_-");
             if (ends) {
+
                 c = StringUtils.replace(c, "_-", "");
 
                 if (c.endsWith(" "))
                     c = StringUtils.replaceLast(c, " ", "");
+
             }
 
             listed = c.equalsIgnoreCase(cpyCommand) || cpyCommand.startsWith(c + " ");
 
             if (listed && ends && cpyCommand.length() > c.length()) {
+
                 listed = false;
                 break;
+
             }
+
         }
 
         return listed;
+
     }
+
 }

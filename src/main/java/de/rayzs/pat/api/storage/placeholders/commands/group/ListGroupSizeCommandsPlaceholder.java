@@ -6,17 +6,27 @@ import org.bukkit.entity.Player;
 
 public class ListGroupSizeCommandsPlaceholder extends PlaceholderStorage {
 
-    public ListGroupSizeCommandsPlaceholder() { super("list_size_commands_group_"); }
+    public ListGroupSizeCommandsPlaceholder() {
+
+        super("list_size_commands_group_");
+
+    }
 
     @Override
     public String onRequest(Player player, String param) {
+
         Group group = GroupManager.getGroupByName(param);
-        if(group == null) return null;
+        if (group == null)
+            return null;
         return String.valueOf(group.getCommands().size());
+
     }
 
     @Override
     public void load() {
+
         super.load();
+
     }
+
 }

@@ -19,13 +19,12 @@ public class ServClearCommand extends ProCommand {
     private final ExpireCache<UUID, String> CONFIRMATION = new ExpireCache<>(4, TimeUnit.SECONDS);
 
     public ServClearCommand() {
-        super(
-                "clear",
-                "clr"
-        );
+
+        super("clear", "clr");
 
         proxyOnly = true;
         serverCommand = true;
+
     }
 
     @Override
@@ -38,16 +37,17 @@ public class ServClearCommand extends ProCommand {
         args = Arrays.copyOfRange(args, 1, args.length);
 
         if (args.length == 0) {
+
             final String confirmationString = "clear";
 
             if (!CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+
                 CONFIRMATION.put(sender.getUniqueId(), confirmationString);
                 sender.sendMessage(
-                        Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_CONFIRM
-                                .replace("%server%", serverName)
-                );
+                        Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_CONFIRM.replace("%server%", serverName));
 
                 return true;
+
             }
 
             Storage.Blacklist.getServerBlacklist(serverName).clear().save();
@@ -55,11 +55,9 @@ public class ServClearCommand extends ProCommand {
 
             CONFIRMATION.remove(sender.getUniqueId());
 
-            sender.sendMessage(
-                    Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER
-                            .replace("%server%", serverName)
-            );
+            sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER.replace("%server%", serverName));
             return true;
+
         }
 
         String groupName = args[0];
@@ -69,13 +67,11 @@ public class ServClearCommand extends ProCommand {
 
             String message = Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST_SERVER;
 
-            message = StringUtils.replace(message,
-                    "%group%", groupName,
-                    "%server%", serverName
-            );
+            message = StringUtils.replace(message, "%group%", groupName, "%server%", serverName);
 
             sender.sendMessage(message);
             return true;
+
         }
 
         groupName = group.getGroupName();
@@ -86,13 +82,11 @@ public class ServClearCommand extends ProCommand {
 
             CONFIRMATION.put(sender.getUniqueId(), confirmationString);
 
-            sender.sendMessage(
-                    Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER_CONFIRM
-                            .replace("%group%", groupName)
-                            .replace("%server%", serverName)
-            );
+            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER_CONFIRM.replace("%group%", groupName)
+                    .replace("%server%", serverName));
 
             return true;
+
         }
 
         group.clear(serverName);
@@ -100,18 +94,19 @@ public class ServClearCommand extends ProCommand {
 
         CONFIRMATION.remove(sender.getUniqueId());
 
-        sender.sendMessage(
-                Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER
-                        .replace("%group%", groupName)
-                        .replace("%server%", serverName)
-        );
+        sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER.replace("%group%", groupName)
+                .replace("%server%", serverName));
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
+
         final int length = args.length;
-        return length < 2 ? Storage.Blacklist.getBlacklists().stream().map(Map.Entry::getKey).toList() :
-                length < 3 ? GroupManager.getGroupNames() : null;
+        return length < 2 ? Storage.Blacklist.getBlacklists().stream().map(Map.Entry::getKey).toList()
+                : length < 3 ? GroupManager.getGroupNames() : null;
+
     }
+
 }

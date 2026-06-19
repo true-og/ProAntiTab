@@ -10,24 +10,35 @@ public class ConfigSectionHelper<T> {
     private final Object obj;
 
     public ConfigSectionHelper(StorageTemplate config, String path, Object obj) {
+
         this.configuration = config.getConfig();
-        this.path = config.getNavigatePath() + (path != null ? "." + path : ""); ;
+        this.path = config.getNavigatePath() + (path != null ? "." + path : "");;
         this.obj = obj;
+
     }
 
     public boolean exist() {
+
         return get() != null;
+
     }
 
     public void set(Object obj) {
+
         configuration.setAndSave(path, obj);
+
     }
 
     public T get() {
+
         return (T) configuration.get(path);
+
     }
 
     public T getOrSet() {
+
         return (T) configuration.getOrSet(path, obj);
+
     }
+
 }

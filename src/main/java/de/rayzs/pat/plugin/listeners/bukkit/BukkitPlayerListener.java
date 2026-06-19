@@ -7,7 +7,6 @@ import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -24,6 +23,7 @@ public class BukkitPlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+
         final Player player = event.getPlayer();
         final UUID uuid = player.getUniqueId();
 
@@ -33,95 +33,130 @@ public class BukkitPlayerListener implements Listener {
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+
             BackendUpdater.handle();
+
         }
 
         CustomServerBrand.preparePlayer(player);
         PermissionUtil.reloadPermissions(sender);
 
         if (CustomServerBrand.isEnabled()) {
+
             CustomServerBrand.sendBrandToPlayer(player);
+
         }
 
         if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+
             if (Storage.getPermissionPlugin() != PermissionPlugin.LUCKPERMS) {
 
                 PATScheduler.createScheduler(() -> {
 
                     if (Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER) {
+
                         PermissionUtil.reloadPermissions(sender);
+
                     }
 
                     if (Reflection.isAtLeast(1, 13)) {
+
                         BukkitAntiTabListener.handleTabCompletion(player);
+
                     }
+
                 }, 20);
 
             }
+
         }
 
         if (!BukkitPacketAnalyzer.inject(player)) {
+
             PATScheduler.createScheduler(() -> {
+
                 if (player.isOnline()) {
+
                     if (!BukkitPacketAnalyzer.inject(player)) {
 
                         if (Storage.ConfigSections.Settings.INJECTION_FAILED.ENABLED) {
 
-                            Logger.info(MessageTranslator.replaceMessage(
-                                    sender,
-                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE
-                            ));
+                            Logger.info(MessageTranslator.replaceMessage(sender,
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE));
 
-                            player.kickPlayer(MessageTranslator.replaceMessage(
-                                    sender,
-                                    Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE
-                            ));
+                            player.kickPlayer(MessageTranslator.replaceMessage(sender,
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE));
+
                         }
+
                     }
+
                 }
+
             }, 10);
+
         }
 
         // Update sub arguments for <1.12.2 servers.
         if (Reflection.isBefore(1, 13)) {
+
             Storage.quickSubArgumentUpdate(uuid);
+
         }
 
         if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate")) {
+
             PATScheduler.createScheduler(() -> {
+
                 if (player.isOnline()) {
+
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
+
                 }
+
             }, 20);
+
         }
+
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
+
         Player player = event.getPlayer();
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.LEFT);
 
         BukkitPacketAnalyzer.uninject(player.getUniqueId());
         PermissionUtil.resetPermissions(player.getUniqueId());
+
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+
         Player player = event.getPlayer();
 
         if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+
             CustomServerBrand.sendBrandToPlayer(player);
+
         }
 
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_WORLD.ENABLED) {
+
             CommandSender sender = CommandSenderHandler.from(player);
 
             assert sender != null;
             PermissionUtil.reloadPermissions(sender);
 
             if (Reflection.isAtLeast(1, 13)) {
+
                 BukkitAntiTabListener.handleTabCompletion(player);
+
             }
+
         }
+
     }
+
 }

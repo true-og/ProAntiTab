@@ -20,9 +20,11 @@ public class VelocitySender extends CommandSenderAbstract {
     private CommandSource sender;
 
     public VelocitySender(Object senderObj) {
+
         super(senderObj);
 
         if (senderObj instanceof UUID uuid) {
+
             final Player player = VelocityLoader.getServer().getPlayer(uuid).get();
 
             this.uuid = uuid;
@@ -31,80 +33,109 @@ public class VelocitySender extends CommandSenderAbstract {
             this.sender = player;
             this.name = player.getUsername();
             return;
+
         }
 
         if (senderObj instanceof Player player) {
+
             this.sender = player;
 
             this.name = player.getUsername();
             this.uuid = player.getUniqueId();
             this.console = false;
             return;
+
         }
 
         this.sender = (CommandSource) senderObj;
 
         if (sender != null) {
+
             this.name = "";
             this.uuid = CommandSenderHandler.CONSOLE_UUID;
+
         } else {
+
             this.name = null;
             this.uuid = null;
+
         }
 
         this.console = true;
+
     }
 
     @Override
     public void updateSenderObject(Object senderObj) {
+
         super.updateSenderObject(senderObj);
 
         if (senderObj instanceof Player player) {
+
             sender = player;
+
         } else if (senderObj instanceof CommandSource commandSource) {
+
             sender = commandSource;
+
         }
+
     }
 
     @Override
     public boolean isConsole() {
+
         return this.console;
+
     }
 
     @Override
     public boolean isPlayer() {
+
         return !this.console;
+
     }
 
     @Override
     public boolean isOperator() {
+
         return false;
+
     }
 
     @Override
     public boolean hasPermission(String permission) {
+
         return sender.hasPermission(permission);
+
     }
 
     @Override
     public UUID getUniqueId() {
+
         return this.uuid;
+
     }
 
     @Override
     public String getName() {
+
         return this.name;
+
     }
 
     @Override
     public String getServerName() {
-        return console
-                ? Storage.SERVER_NAME
-                : Storage.getLoader().getPlayerServerName(this.uuid);
+
+        return console ? Storage.SERVER_NAME : Storage.getLoader().getPlayerServerName(this.uuid);
+
     }
 
     @Override
     public void sendMessage(String message) {
+
         MessageTranslator.send(sender, message);
+
     }
+
 }

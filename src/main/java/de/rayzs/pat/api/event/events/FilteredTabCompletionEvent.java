@@ -9,28 +9,39 @@ public abstract class FilteredTabCompletionEvent extends PATEvent<FilteredTabCom
     private List<String> completion;
 
     public FilteredTabCompletionEvent() {
+
         super(null);
         this.cursor = null;
         this.completion = null;
+
     }
 
     public FilteredTabCompletionEvent(Object senderObj, String cursor, List<String> completion) {
+
         super(senderObj);
         this.cursor = cursor;
         this.completion = completion;
+
     }
 
     public abstract void handle(FilteredTabCompletionEvent event);
 
     public String getCursor() {
+
         return cursor;
+
     }
 
     public List<String> getCompletion() {
+
         return completion;
+
     }
 
     public void setCompletion(List<String> completion) {
+
         this.completion = completion;
+
     }
+
 }

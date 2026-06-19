@@ -10,22 +10,31 @@ public class ExtractSection extends ConfigStorage {
     public MultipleMessagesHelper MESSAGE;
 
     public ExtractSection() {
+
         super("extract");
+
     }
 
     public String USAGE, PLUGIN_NOT_FOUND, SUCCESS;
 
     @Override
     public void load() {
+
         super.load();
 
         if (Reflection.isProxyServer()) {
+
             return;
+
         }
 
-        USAGE = new ConfigSectionHelper<String>(this, "usage", "&7Usage: &f/pat extract (plugin) <option> &7or &f(group) <option>").getOrSet();
-        PLUGIN_NOT_FOUND = new ConfigSectionHelper<String>(this, "plugin-not-found", "&cPlugin %plugin% not found!").getOrSet();
-        SUCCESS = new ConfigSectionHelper<String>(this, "success", "&aSuccessfully extracted &e%amount% &anew commands from %plugin%!").getOrSet();
+        USAGE = new ConfigSectionHelper<String>(this, "usage",
+                "&7Usage: &f/pat extract (plugin) <option> &7or &f(group) <option>").getOrSet();
+        PLUGIN_NOT_FOUND = new ConfigSectionHelper<String>(this, "plugin-not-found", "&cPlugin %plugin% not found!")
+                .getOrSet();
+        SUCCESS = new ConfigSectionHelper<String>(this, "success",
+                "&aSuccessfully extracted &e%amount% &anew commands from %plugin%!").getOrSet();
 
     }
+
 }

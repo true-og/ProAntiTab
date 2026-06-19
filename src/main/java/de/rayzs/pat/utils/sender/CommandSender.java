@@ -19,4 +19,5 @@ public interface CommandSender {
     String getServerName();
 
     void sendMessage(String message);
+
 }

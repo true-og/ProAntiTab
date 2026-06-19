@@ -8,13 +8,19 @@ public class ReloadSection extends ConfigStorage {
     public String LOADING, DONE;
 
     public ReloadSection() {
+
         super("reload");
+
     }
 
     @Override
     public void load() {
+
         super.load();
         LOADING = new ConfigSectionHelper<String>(this, "loading", "&eReloading all configuration files...").getOrSet();
-        DONE = new ConfigSectionHelper<String>(this, "done", "&aSuccessfully reloaded all configuration files!").getOrSet();
+        DONE = new ConfigSectionHelper<String>(this, "done", "&aSuccessfully reloaded all configuration files!")
+                .getOrSet();
+
     }
+
 }

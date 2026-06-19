@@ -12,10 +12,9 @@ import java.util.List;
 public class SetPriorityCommand extends ProCommand {
 
     public SetPriorityCommand() {
-        super(
-                "setpriority",
-                "sp"
-        );
+
+        super("setpriority", "sp");
+
     }
 
     @Override
@@ -24,45 +23,62 @@ public class SetPriorityCommand extends ProCommand {
         boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
 
         if (backend) {
+
             sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
             return true;
+
         }
 
         if (args.length < 2) {
+
             return false;
+
         }
 
         String groupName = args[0];
         Group group = GroupManager.getGroupByName(groupName);
 
         if (group == null) {
+
             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", groupName));
             return true;
+
         }
 
         String priorityStr = args[1];
 
         try {
+
             int priority = Integer.parseInt(priorityStr);
 
             if (priority > 0) {
+
                 group.setPriority(priority);
 
                 GroupManager.sort();
                 Storage.handleChange();
 
-                sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_SUCCESS.replace("%group%", group.getGroupName()).replace("%priority%", priorityStr));
+                sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_SUCCESS
+                        .replace("%group%", group.getGroupName()).replace("%priority%", priorityStr));
                 return true;
+
             }
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
 
-        sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_FAILED.replace("%group%", groupName).replace("%priority%", priorityStr));
+        }
+
+        sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_FAILED.replace("%group%", groupName)
+                .replace("%priority%", priorityStr));
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
+
         return args.length < 2 ? GroupManager.getGroupNames() : null;
+
     }
+
 }

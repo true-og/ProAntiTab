@@ -24,16 +24,17 @@ import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class BukkitBlockCommandListener implements Listener {
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onUnknownCommandRecognition(PlayerCommandPreprocessEvent event) {
+
         final Player player = event.getPlayer();
         final CommandSender sender = CommandSenderHandler.from(player);
         final World world = player.getWorld();
 
-        String rawCommand = StringUtils.getFirstArg(event.getMessage()),
-                command =  rawCommand.substring(1);
+        String rawCommand = StringUtils.getFirstArg(event.getMessage()), command = rawCommand.substring(1);
 
-        if (!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled()) return;
+        if (!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled())
+            return;
 
         if (PermissionUtil.hasBypassPermission(sender))
             return;
@@ -45,97 +46,112 @@ public class BukkitBlockCommandListener implements Listener {
             return;
 
         event.setCancelled(true);
-        MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE, "%command%", command, "%world%", world.getName());
+        MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE, "%command%",
+                command, "%world%", world.getName());
+
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
+
         final Player player = event.getPlayer();
         final CommandSender sender = CommandSenderHandler.from(player);
 
         final String commandFirstArg = StringUtils.getFirstArg(event.getMessage());
 
         if (Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.isCommand(commandFirstArg)) {
+
             String command = event.getMessage();
 
             if (command.contains(" ")) {
+
                 String[] args = command.split(" ");
                 args[0] = args[0].toLowerCase();
                 command = String.join(" ", args);
-            } else command = command.toLowerCase();
+
+            } else
+                command = command.toLowerCase();
 
             if (!commandFirstArg.equals(command)) {
+
                 player.chat(command);
                 event.setCancelled(true);
                 return;
+
             }
+
         }
 
         World world = player.getWorld();
-        String command = event.getMessage(),
-                worldName = world.getName();
+        String command = event.getMessage(), worldName = world.getName();
 
         command = command.substring(1);
         command = StringUtils.getFirstArg(command);
 
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+
             return;
+
         }
 
         if (PermissionUtil.hasBypassPermission(sender, command)) {
+
             return;
+
         }
 
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(
-                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
-                "%player%", player.getName(),
-                "%command%", displayCommand,
-                "%world%", worldName);
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%",
+                displayCommand, "%world%", worldName);
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
 
-            MessageTranslator.send(
-                    player,
-                    Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
-                    "%command%", StringUtils.getFirstArg(displayCommand)
-            );
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%",
+                    StringUtils.getFirstArg(displayCommand));
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
                 Logger.info(notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+
                 Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
                 if (p != null) {
+
                     MessageTranslator.send(p, notificationMessage);
+
                 }
+
             });
 
             event.setCancelled(true);
             return;
+
         }
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
 
-            MessageTranslator.send(
-                    player,
-                    Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
-                    "%command%", StringUtils.getFirstArg(displayCommand)
-            );
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%",
+                    StringUtils.getFirstArg(displayCommand));
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
                 Logger.info(notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+
                 Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
                 if (p != null) {
+
                     MessageTranslator.send(p, notificationMessage);
+
                 }
+
             });
 
             event.setCancelled(true);
             return;
+
         }
 
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
@@ -145,26 +161,29 @@ public class BukkitBlockCommandListener implements Listener {
         boolean blockedNamespace = false;
 
         if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
+
             blockedNamespace = cancelBlockedCommand
                     ? Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)
                     : Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesAlwaysBlock(command);
 
-            if (blockedNamespace) allowed = false;
+            if (blockedNamespace)
+                allowed = false;
+
         }
 
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED && !blockedNamespace) {
+
             return;
+
         }
 
         if (!allowed) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
-                    player,
-                    event.getMessage(),
-                    true,
-                    !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED
-            );
+
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player,
+                    event.getMessage(), true, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
 
             if (executeCommandEvent.isBlocked()) {
+
                 event.setCancelled(true);
 
                 if (!executeCommandEvent.doesNotify())
@@ -173,19 +192,27 @@ public class BukkitBlockCommandListener implements Listener {
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
                     Logger.info(notificationMessage);
 
-                Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-                    Player target = Bukkit.getServer().getPlayer(uuid);
-                    MessageTranslator.send(target, notificationMessage);
-                });
+                Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null)
+                        .forEach(uuid ->
+                        {
+
+                            Player target = Bukkit.getServer().getPlayer(uuid);
+                            MessageTranslator.send(target, notificationMessage);
+
+                        });
 
             }
 
             if (executeCommandEvent.isCancelled())
                 return;
+
         }
 
-        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), false, false);
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(),
+                false, false);
         if (executeCommandEvent.isBlocked())
             event.setCancelled(true);
+
     }
+
 }

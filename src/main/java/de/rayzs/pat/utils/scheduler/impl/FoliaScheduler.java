@@ -15,44 +15,64 @@ public class FoliaScheduler implements PATSchedulerTask {
     public void getInstance(Runnable runnable, Player player) {
 
         if (player == null) {
+
             SCHEDULER.execute(BukkitLoader.getPlugin(), runnable);
+
         } else {
+
             player.getScheduler().run(BukkitLoader.getPlugin(), scheduledTask -> runnable.run(), null);
+
         }
+
     }
 
     @Override
     public PATSchedulerTask getInstance(boolean async, Runnable runnable, long time, long period) {
+
         this.task = SCHEDULER.runAtFixedRate(BukkitLoader.getPlugin(), __ -> runnable.run(), time, period);
         return this;
+
     }
 
     @Override
     public PATSchedulerTask getInstance(boolean async, Runnable runnable, long time) {
+
         this.task = SCHEDULER.runDelayed(BukkitLoader.getPlugin(), __ -> runnable.run(), time);
         return this;
+
     }
 
     @Override
     public PATSchedulerTask getInstance(boolean async, Runnable runnable) {
+
         this.task = SCHEDULER.run(BukkitLoader.getPlugin(), __ -> runnable.run());
         return this;
+
     }
 
     @Override
     public boolean isActive() {
+
         return !this.task.isCancelled();
+
     }
 
     @Override
     public void setTaskId(int taskId) {
-        if(taskId == -1 || taskId == -5) {
+
+        if (taskId == -1 || taskId == -5) {
+
             cancelTask();
+
         }
+
     }
 
     @Override
     public void cancelTask() {
+
         this.task.cancel();
+
     }
+
 }

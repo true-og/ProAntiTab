@@ -11,28 +11,23 @@ public class CustomBrandSection extends ConfigStorage {
     public MultipleMessagesHelper BRANDS;
 
     public CustomBrandSection() {
+
         super("custom-server-brand");
+
     }
 
     @Override
     public void load() {
+
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", false).getOrSet();
         REPEAT_DELAY = new ConfigSectionHelper<Integer>(this, "repeat-delay", 3).getOrSet();
-        BRANDS = new MultipleMessagesHelper(this, "brands", Arrays.asList(
-                "&f&lP&froAntiTab |",
-                "&fP&lr&foAntiTab /",
-                "&fPr&lo&fAntiTab -",
-                "&fPro&lA&fntiTab |",
-                "&fProA&ln&ftiTab \\",
-                "&fProAn&lt&fiTab |",
-                "&fProAnt&li&fTab /",
-                "&fProAnti&lT&fab -",
-                "&fProAnti&lT&fab \\",
-                "&fProAntiT&la&fb |",
-                "&fProAntiTa&lb&f /",
-                "&fProAntiTab -",
-                "&fProAntiTab \\"
-        ));
+        BRANDS = new MultipleMessagesHelper(this, "brands",
+                Arrays.asList("&f&lP&froAntiTab |", "&fP&lr&foAntiTab /", "&fPr&lo&fAntiTab -", "&fPro&lA&fntiTab |",
+                        "&fProA&ln&ftiTab \\", "&fProAn&lt&fiTab |", "&fProAnt&li&fTab /", "&fProAnti&lT&fab -",
+                        "&fProAnti&lT&fab \\", "&fProAntiT&la&fb |", "&fProAntiTa&lb&f /", "&fProAntiTab -",
+                        "&fProAntiTab \\"));
+
     }
+
 }

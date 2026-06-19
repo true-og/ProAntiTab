@@ -6,10 +6,17 @@ import org.bukkit.entity.Player;
 
 public class GeneralCurrentVersionPlaceholder extends PlaceholderStorage {
 
-    public GeneralCurrentVersionPlaceholder() { super("general_version_current"); }
+    public GeneralCurrentVersionPlaceholder() {
+
+        super("general_version_current");
+
+    }
 
     @Override
     public String onRequest(Player player, String param) {
+
         return Storage.CURRENT_VERSION;
+
     }
+
 }

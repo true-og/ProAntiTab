@@ -1,7 +1,5 @@
 package de.rayzs.pat.utils.scheduler;
 
-import org.bukkit.entity.Player;
-
 public interface PATSchedulerTask {
 
     PATSchedulerTask getInstance(boolean async, Runnable runnable, long time, long period);
@@ -12,4 +10,5 @@ public interface PATSchedulerTask {
     void setTaskId(int taskId);
 
     void cancelTask();
+
 }

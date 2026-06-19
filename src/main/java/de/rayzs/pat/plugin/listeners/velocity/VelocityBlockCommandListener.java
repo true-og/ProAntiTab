@@ -22,22 +22,29 @@ public class VelocityBlockCommandListener {
 
     @Subscribe
     public void onCommandExecute(CommandExecuteEvent event) {
+
         handleCommand(event);
+
     }
 
     public static CommandExecuteEvent handleCommand(Player player, String command) {
+
         return handleCommand(new CommandExecuteEvent(player, command));
+
     }
 
     public static CommandExecuteEvent handleCommand(CommandExecuteEvent event) {
+
         if (!event.getResult().isAllowed()) {
+
             return event;
+
         }
 
         final CommandSource commandSource = event.getCommandSource();
         final Object consoleSender = Storage.getLoader().getConsoleSender();
 
-        if(! (commandSource instanceof Player))
+        if (!(commandSource instanceof Player))
             return event;
 
         final Player player = (Player) commandSource;
@@ -47,8 +54,12 @@ public class VelocityBlockCommandListener {
                 : "unknown";
 
         String tmpCommand = StringUtils.getFirstArg(event.getCommand());
-        if (Communicator.get().hasConnectedClients() && Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.isCommand(tmpCommand)) {
+        if (Communicator.get().hasConnectedClients()
+                && Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.isCommand(tmpCommand))
+        {
+
             tmpCommand = tmpCommand.toLowerCase();
+
         }
 
         final String command = tmpCommand;
@@ -58,60 +69,60 @@ public class VelocityBlockCommandListener {
 
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
-
         final List<String> notificationMessage = MessageTranslator.replaceMessageList(
-                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
-                "%player%", player.getUsername(),
-                "%command%", displayCommand,
-                "%server%", serverName
-        );
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%",
+                displayCommand, "%server%", serverName);
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
 
             Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
-            MessageTranslator.send(
-                    player,
-                    Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
-                    "%command%", StringUtils.getFirstArg(displayCommand)
-            );
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%",
+                    StringUtils.getFirstArg(displayCommand));
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
                 MessageTranslator.send(consoleSender, notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+
                 Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
                 if (p != null) {
+
                     MessageTranslator.send(p, notificationMessage);
+
                 }
+
             });
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             return event;
+
         }
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
 
             Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
-            MessageTranslator.send(
-                    player,
-                    Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
-                    "%command%", StringUtils.getFirstArg(displayCommand)
-            );
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%",
+                    StringUtils.getFirstArg(displayCommand));
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
                 MessageTranslator.send(consoleSender, notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+
                 Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
                 if (p != null) {
+
                     MessageTranslator.send(p, notificationMessage);
+
                 }
+
             });
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             return event;
+
         }
 
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
@@ -120,29 +131,30 @@ public class VelocityBlockCommandListener {
         boolean allowed = Storage.Blacklist.canPlayerAccessChat(sender, groups, command, serverName);
         boolean blockedNamespace = false;
 
-
         if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
+
             blockedNamespace = cancelBlockedCommand
                     ? Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)
                     : Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesAlwaysBlock(command);
 
-            if (blockedNamespace) allowed = false;
-        }
+            if (blockedNamespace)
+                allowed = false;
 
+        }
 
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED && !blockedNamespace) {
+
             return event;
+
         }
 
-
         if (!allowed) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
-                    player,
-                    event.getCommand(),
-                    true,
-                    !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player,
+                    event.getCommand(), true, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
 
             if (executeCommandEvent.isBlocked()) {
+
                 event.setResult(CommandExecuteEvent.CommandResult.denied());
 
                 if (!executeCommandEvent.doesNotify())
@@ -154,24 +166,34 @@ public class VelocityBlockCommandListener {
                     MessageTranslator.send(consoleSender, notificationMessage);
 
                 Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+
                     Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
                     if (p != null) {
+
                         MessageTranslator.send(p, notificationMessage);
+
                     }
+
                 });
+
             }
 
             if (executeCommandEvent.isCancelled())
                 return event;
+
         }
 
-
-        final ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getCommand(), false, false);
+        final ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player,
+                event.getCommand(), false, false);
 
         if (executeCommandEvent.isBlocked()) {
+
             event.setResult(CommandExecuteEvent.CommandResult.denied());
+
         }
 
         return event;
+
     }
+
 }

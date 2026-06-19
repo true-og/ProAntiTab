@@ -20,39 +20,55 @@ public class BungeeClient implements Client, Listener {
     public BungeeClient() {
 
         if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) {
+
             return;
+
         }
 
         SERVER.registerChannel(CHANNEL_NAME);
         SERVER.getPluginManager().registerListener(BungeeLoader.getPlugin(), this);
+
     }
 
     @Override
-    public void reload() {}
+    public void reload() {
+
+    }
 
     @Override
     public void send(CommunicationPackets.PATPacket packet) {
+
         final byte[] preparedPacket = CommunicationPackets.preparePacket(packet);
 
         if (preparedPacket == null) {
+
             return;
+
         }
 
-
         for (ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
+
             try {
+
                 serverInfo.sendData(CHANNEL_NAME, preparedPacket);
+
             } catch (Exception exception) {
+
                 exception.printStackTrace();
+
             }
 
         }
+
     }
 
     @EventHandler
     public void onQueryReceive(PluginMessageEvent event) {
+
         if (!event.getTag().equalsIgnoreCase(CHANNEL_NAME)) {
+
             return;
+
         }
 
         final Server server = (Server) event.getSender();
@@ -60,21 +76,28 @@ public class BungeeClient implements Client, Listener {
         final UUID clientId = Communicator.get().getClientId(serverName);
 
         if (!CommunicationPackets.isInitialPacket(event.getData()) && clientId == null) {
+
             return;
+
         }
 
         try {
 
             Object packetObj = CommunicationPackets.readPacket(event.getData(), clientId);
             if (!CommunicationPackets.isB2PPacket(packetObj)) {
+
                 return;
+
             }
 
             Communicator.get().handleB2PPacket(serverName, (CommunicationPackets.PATPacket) packetObj);
 
         } catch (Throwable throwable) {
+
             throwable.printStackTrace();
+
         }
 
     }
+
 }

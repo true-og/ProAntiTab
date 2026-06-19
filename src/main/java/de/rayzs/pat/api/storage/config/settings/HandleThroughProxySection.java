@@ -14,13 +14,17 @@ public class HandleThroughProxySection extends ConfigStorage {
     public String TOKEN;
 
     public HandleThroughProxySection() {
+
         super("handle-through-proxy");
+
     }
 
     @Override
     public void load() {
+
         super.load();
-        if (Reflection.isProxyServer()) return;
+        if (Reflection.isProxyServer())
+            return;
 
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", false).getOrSet();
         TOKEN = new ConfigSectionHelper<String>(this, "token", "insert-token-of-proxy-here").getOrSet();
@@ -29,5 +33,7 @@ public class HandleThroughProxySection extends ConfigStorage {
 
         LOAD_FROM_ENV = new ConfigSectionHelper<Boolean>(this, "load-from-env.enabled", false).getOrSet();
         ENV_NAME = new ConfigSectionHelper<String>(this, "load-from-env.name", "PAT_TOKEN").getOrSet();
+
     }
+
 }

@@ -11,14 +11,22 @@ public class NotificationSection extends ConfigStorage {
     public MultipleMessagesHelper ALERT;
 
     public NotificationSection() {
+
         super("notification");
+
     }
 
     @Override
     public void load() {
+
         super.load();
         ENABLED = new ConfigSectionHelper<String>(this, "enabled", "&aEnabled notifications").getOrSet();
         DISABLED = new ConfigSectionHelper<String>(this, "disabled", "&cDisabled notifications").getOrSet();
-        ALERT = new MultipleMessagesHelper(this, "alert", Collections.singletonList("&8[&4ALERT&8] &c%player% &8(&7" + (Reflection.isProxyServer() ? "server: &e%server%" : "world: &e%world%") + "&8) &ctried to execute the following blocked command: &4%command%"));
+        ALERT = new MultipleMessagesHelper(this, "alert",
+                Collections.singletonList("&8[&4ALERT&8] &c%player% &8(&7"
+                        + (Reflection.isProxyServer() ? "server: &e%server%" : "world: &e%world%")
+                        + "&8) &ctried to execute the following blocked command: &4%command%"));
+
     }
+
 }

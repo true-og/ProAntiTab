@@ -15,13 +15,12 @@ import java.util.Map;
 public class ServListCommand extends ProCommand {
 
     public ServListCommand() {
-        super(
-                "list",
-                "ls"
-        );
+
+        super("list", "ls");
 
         proxyOnly = true;
         serverCommand = true;
+
     }
 
     @Override
@@ -37,21 +36,17 @@ public class ServListCommand extends ProCommand {
 
             GeneralBlacklist blacklist = Storage.Blacklist.getServerBlacklist(serverName);
 
-            String commandsListMessage = StringUtils.getStringList(
-                    blacklist.getCommands(),
-                    Storage.ConfigSections.Messages.BLACKLIST.LIST_SERVER_SPLITTER
-            );
+            String commandsListMessage = StringUtils.getStringList(blacklist.getCommands(),
+                    Storage.ConfigSections.Messages.BLACKLIST.LIST_SERVER_SPLITTER);
 
             String message = Storage.ConfigSections.Messages.BLACKLIST.LIST_SERVER_MESSAGE;
 
-            message = StringUtils.replace(message,
-                    "%size%", String.valueOf(blacklist.getCommands().size()),
-                    "%commands%", commandsListMessage,
-                    "%server%", serverName
-            );
+            message = StringUtils.replace(message, "%size%", String.valueOf(blacklist.getCommands().size()),
+                    "%commands%", commandsListMessage, "%server%", serverName);
 
             sender.sendMessage(message);
             return true;
+
         }
 
         String groupName = args[0];
@@ -61,36 +56,33 @@ public class ServListCommand extends ProCommand {
 
             String message = Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST_SERVER;
 
-            message = StringUtils.replace(message,
-                    "%group%", groupName,
-                    "%server%", serverName
-            );
+            message = StringUtils.replace(message, "%group%", groupName, "%server%", serverName);
 
             sender.sendMessage(message);
             return true;
+
         }
 
-        String commandsListMessage = StringUtils.getStringList(
-                group.getCommands(serverName),
-                Storage.ConfigSections.Messages.GROUP.LIST_SERVER_SPLITTER
-        );
+        String commandsListMessage = StringUtils.getStringList(group.getCommands(serverName),
+                Storage.ConfigSections.Messages.GROUP.LIST_SERVER_SPLITTER);
 
         String message = Storage.ConfigSections.Messages.GROUP.LIST_SERVER_MESSAGE;
-        message = StringUtils.replace(message,
-                "%group%", groupName,
-                "%size%", String.valueOf(group.getCommands(serverName).size()),
-                "%commands%", commandsListMessage,
-                "%server%", serverName
-        );
+        message = StringUtils.replace(message, "%group%", groupName, "%size%",
+                String.valueOf(group.getCommands(serverName).size()), "%commands%", commandsListMessage, "%server%",
+                serverName);
 
         sender.sendMessage(message);
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
+
         final int length = args.length;
-        return length < 2 ? Storage.Blacklist.getBlacklists().stream().map(Map.Entry::getKey).toList() :
-                length < 3 ? GroupManager.getGroupNames() : null;
+        return length < 2 ? Storage.Blacklist.getBlacklists().stream().map(Map.Entry::getKey).toList()
+                : length < 3 ? GroupManager.getGroupNames() : null;
+
     }
+
 }

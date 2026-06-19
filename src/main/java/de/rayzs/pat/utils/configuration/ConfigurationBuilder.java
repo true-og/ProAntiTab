@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.io.File;
 
 public interface ConfigurationBuilder {
+
     void reload();
     void save();
     String getFilePath();
@@ -19,4 +20,5 @@ public interface ConfigurationBuilder {
     Collection<String> getKeys(String section, boolean deep);
     File getFile();
     boolean loadDefault();
+
 }

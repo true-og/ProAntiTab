@@ -6,20 +6,32 @@ import java.io.*;
 public abstract class ConfigurationProvider {
 
     /*
-        Copyright (c) 2012, md_5. All rights reserved.
-        Original code from Bungeecord source:
-        https://github.com/SpigotMC/BungeeCord/blob/master/config/src/main/java/net/md_5/bungee/config/ConfigurationProvider.java
+     * Copyright (c) 2012, md_5. All rights reserved. Original code from Bungeecord
+     * source:
+     * https://github.com/SpigotMC/BungeeCord/blob/master/config/src/main/java/net/
+     * md_5/bungee/config/ConfigurationProvider.java
      */
 
     private static final Map<Class<? extends ConfigurationProvider>, ConfigurationProvider> providers = new HashMap<>();
 
     static {
+
         try {
+
             providers.put(YamlConfiguration.class, new YamlConfiguration());
-        } catch (NoClassDefFoundError noClassDefFoundError) {}
+
+        } catch (NoClassDefFoundError noClassDefFoundError) {
+
+        }
+
         try {
+
             providers.put(JsonConfiguration.class, new JsonConfiguration());
-        } catch (NoClassDefFoundError noClassDefFoundError) {}
+
+        } catch (NoClassDefFoundError noClassDefFoundError) {
+
+        }
+
     }
 
     public abstract Configuration load(String paramString, Configuration paramConfiguration);
@@ -43,6 +55,9 @@ public abstract class ConfigurationProvider {
     public abstract void save(Configuration paramConfiguration, File paramFile) throws IOException;
 
     public static ConfigurationProvider getProvider(Class<? extends ConfigurationProvider> provider) {
+
         return providers.get(provider);
+
     }
+
 }

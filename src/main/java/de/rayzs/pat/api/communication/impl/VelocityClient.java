@@ -19,40 +19,55 @@ public class VelocityClient implements Client {
     public VelocityClient() {
 
         if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) {
+
             return;
+
         }
 
         SERVER.getChannelRegistrar().register(IDENTIFIER);
         SERVER.getEventManager().register(VelocityLoader.getInstance(), this);
+
     }
 
     @Override
-    public void reload() {}
+    public void reload() {
+
+    }
 
     @Override
     public void send(CommunicationPackets.PATPacket packet) {
+
         final byte[] preparedPacket = CommunicationPackets.preparePacket(packet);
 
         if (preparedPacket == null) {
-            return;
-        }
 
+            return;
+
+        }
 
         for (RegisteredServer registeredServer : SERVER.getAllServers()) {
 
             try {
+
                 registeredServer.sendPluginMessage(IDENTIFIER, preparedPacket);
+
             } catch (Exception exception) {
+
                 exception.printStackTrace();
+
             }
 
         }
+
     }
 
     @Subscribe
     public void onQueryReceive(PluginMessageEvent event) {
+
         if (event.getIdentifier() != IDENTIFIER) {
+
             return;
+
         }
 
         final ServerConnection server = (ServerConnection) event.getSource();
@@ -60,13 +75,17 @@ public class VelocityClient implements Client {
         final UUID clientId = Communicator.get().getClientId(serverName);
 
         if (!CommunicationPackets.isInitialPacket(event.getData()) && clientId == null) {
+
             return;
+
         }
 
         Object packetObj = CommunicationPackets.readPacket(event.getData(), clientId);
 
         if (!CommunicationPackets.isB2PPacket(packetObj)) {
+
             return;
+
         }
 
         Communicator.get().handleB2PPacket(serverName, (CommunicationPackets.PATPacket) packetObj);
@@ -74,6 +93,9 @@ public class VelocityClient implements Client {
     }
 
     public static MinecraftChannelIdentifier getIdentifier() {
+
         return IDENTIFIER;
+
     }
+
 }

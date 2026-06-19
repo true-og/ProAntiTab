@@ -48,37 +48,52 @@ public class BungeePacketAnalyzer {
     private static List<String> PROXY_COMMANDS;
 
     static {
+
         ProxyCommandNodeHelper.setDefaultSuggestionProvider(Commands.SuggestionRegistry.ASK_SERVER);
         loadProxyCommands();
+
     }
 
     public static void loadProxyCommands() {
+
         PROXY_COMMANDS = ProxyServer.getInstance().getPluginManager().getCommands().stream().map(entry -> {
+
             String key = entry.getKey();
             return key.startsWith("/") ? key.substring(1) : key;
+
         }).toList();
+
     }
 
     public static void injectAll() {
+
         ProxyServer.getInstance().getPlayers().forEach(BungeePacketAnalyzer::inject);
+
     }
 
     public static void uninjectAll() {
+
         BungeePacketAnalyzer.INJECTED_PLAYERS.keySet().forEach(BungeePacketAnalyzer::uninject);
         BungeePacketAnalyzer.INJECTED_PLAYERS.clear();
+
     }
 
     public static void setPluginCommands() {
-        if(!PLUGIN_COMMANDS.isEmpty()) return;
-        ProxyServer.getInstance().getPluginManager().getCommands().stream().filter(entry -> !PLUGIN_COMMANDS.contains(entry.getKey())).forEach(entry -> PLUGIN_COMMANDS.add(entry.getKey()));
+
+        if (!PLUGIN_COMMANDS.isEmpty())
+            return;
+        ProxyServer.getInstance().getPluginManager().getCommands().stream()
+                .filter(entry -> !PLUGIN_COMMANDS.contains(entry.getKey()))
+                .forEach(entry -> PLUGIN_COMMANDS.add(entry.getKey()));
+
     }
 
     public static boolean inject(ProxiedPlayer player) {
 
-        if(channelWrapperClass == null)
+        if (channelWrapperClass == null)
             channelWrapperClass = Reflection.getClass("net.md_5.bungee.netty.ChannelWrapper");
 
-        if(serverConnectionClass == null)
+        if (serverConnectionClass == null)
             serverConnectionClass = Reflection.getClass("net.md_5.bungee.ServerConnection");
 
         Object channelWrapperObj;
@@ -86,13 +101,17 @@ public class BungeePacketAnalyzer {
         Channel channel;
 
         try {
+
             channelField = Reflection.getFieldByName(serverConnectionClass, "ch");
             channelWrapperObj = channelField.get(player.getServer());
-            channel = (Channel) Reflection.getFieldsByType(channelWrapperClass, "Channel", Reflection.SearchOption.ENDS).get(0).get(channelWrapperObj);
+            channel = (Channel) Reflection.getFieldsByType(channelWrapperClass, "Channel", Reflection.SearchOption.ENDS)
+                    .get(0).get(channelWrapperObj);
 
-            if(channel == null) {
+            if (channel == null) {
+
                 Logger.warning("Failed to inject " + player.getName() + "! Channel is null.");
                 return false;
+
             }
 
             channelField.setAccessible(false);
@@ -100,12 +119,16 @@ public class BungeePacketAnalyzer {
             if (channel.pipeline().names().contains(BungeePacketAnalyzer.HANDLER_NAME))
                 uninject(player);
 
-            channel.pipeline().addAfter(BungeePacketAnalyzer.PIPELINE_NAME, BungeePacketAnalyzer.HANDLER_NAME, new PacketDecoder(player));
+            channel.pipeline().addAfter(BungeePacketAnalyzer.PIPELINE_NAME, BungeePacketAnalyzer.HANDLER_NAME,
+                    new PacketDecoder(player));
             BungeePacketAnalyzer.INJECTED_PLAYERS.put(player, channel);
 
         } catch (Exception exception) {
+
             if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
+
                 exception.printStackTrace();
+
             }
 
             return false;
@@ -113,40 +136,55 @@ public class BungeePacketAnalyzer {
         }
 
         return true;
+
     }
 
     public static void uninject(ProxiedPlayer player) {
+
         BungeePacketAnalyzer.PLAYER_INPUT_CACHE.remove(player.getUniqueId());
         BungeePacketAnalyzer.PLAYER_MODIFIED.remove(player);
 
-        if(BungeePacketAnalyzer.INJECTED_PLAYERS.containsKey(player)) {
+        if (BungeePacketAnalyzer.INJECTED_PLAYERS.containsKey(player)) {
+
             Channel channel = BungeePacketAnalyzer.INJECTED_PLAYERS.get(player);
-            if(channel != null) {
+            if (channel != null) {
+
                 BungeePacketAnalyzer.INJECTED_PLAYERS.remove(player);
                 channel.eventLoop().submit(() -> {
+
                     ChannelPipeline pipeline = channel.pipeline();
 
                     if (pipeline.names().contains(BungeePacketAnalyzer.HANDLER_NAME))
                         pipeline.remove(BungeePacketAnalyzer.HANDLER_NAME);
+
                 });
+
             }
+
         }
+
     }
 
     public static void setPlayerInput(ProxiedPlayer player, String input) {
+
         PLAYER_INPUT_CACHE.putIgnoreIfContains(player.getUniqueId(), input);
+
     }
 
     public static String getPlayerInput(ProxiedPlayer player) {
+
         String input = PLAYER_INPUT_CACHE.get(player.getUniqueId());
         PLAYER_INPUT_CACHE.remove(player.getUniqueId());
         return input;
+
     }
 
     private static void modifyCommands(ProxiedPlayer player, CommandSender sender, Commands commands) {
+
         String serverName = sender.getServerName();
 
-        final boolean ignore = PermissionUtil.hasBypassPermission(sender) || Storage.Blacklist.isDisabledServer(serverName);
+        final boolean ignore = PermissionUtil.hasBypassPermission(sender)
+                || Storage.Blacklist.isDisabledServer(serverName);
 
         ProxyCommandNodeHelper helper = new ProxyCommandNodeHelper<CommandNode>(commands.getRoot());
 
@@ -156,31 +194,44 @@ public class BungeePacketAnalyzer {
         List<String> playerCommands = new ArrayList<>();
 
         if (!ignore) {
+
             final List<Group> groups = GroupManager.getPlayerGroups(sender);
 
             final Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
             if (!cache.containsKey(serverName)) {
+
                 cache.put(serverName, new CommandsCache());
+
             }
 
             final CommandsCache commandsCache = cache.get(serverName);
             commandsCache.handleCommands(commandsAsString, serverName);
 
-            final List<String> tmpPlayerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName);
+            final List<String> tmpPlayerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups,
+                    serverName);
 
             if (commands.getRoot().getChildren().size() != 0) {
+
                 helper.removeIf(str -> !tmpPlayerCommands.contains(str));
+
             }
 
             if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE) {
-                Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines().forEach(input -> helper.add(input, false));
+
+                Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines()
+                        .forEach(input -> helper.add(input, false));
+
             }
 
             if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ALWAYS_TAB_COMPLETABLE) {
-                Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines().forEach(input -> helper.add(input, false));
+
+                Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines()
+                        .forEach(input -> helper.add(input, false));
+
             }
 
             playerCommands = tmpPlayerCommands;
+
         }
 
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
@@ -192,43 +243,62 @@ public class BungeePacketAnalyzer {
                 continue;
 
             if (!command.getValue().hasPermission(player)) {
+
                 continue;
+
             }
 
             String commandName = command.getKey();
             commandName = commandName.startsWith("/") ? commandName.substring(1) : commandName;
 
             if (!ignore) {
-                boolean tabablePluginCommand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(commandName);
-                boolean tabableVersionCommand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(commandName);
+
+                boolean tabablePluginCommand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN
+                        .isTabCompletable(commandName);
+                boolean tabableVersionCommand = Storage.ConfigSections.Settings.CUSTOM_VERSION
+                        .isTabCompletable(commandName);
 
                 if (!tabablePluginCommand && !tabableVersionCommand && !playerCommands.contains(commandName)) {
+
                     continue;
+
                 }
+
             }
 
             CommandNode dummy = ProxyCommandNodeHelper.createDummyCommandNode(command.getKey());
             commands.getRoot().addChild(dummy);
+
         }
 
-
         for (String command : PROXY_COMMANDS) {
+
             if (ignore || playerCommands.contains(command)) {
+
                 helper.add(command, true);
+
             }
+
         }
 
         if (!ignore) {
+
             SubArguments.handleCommandNode(player.getUniqueId(), helper);
+
         }
+
     }
 
     public static void sendCommandsPacket() {
+
         if (!Communicator.get().hasConnectedClients()) {
+
             return;
+
         }
 
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+
             if (player.getPendingConnection().getVersion() < 754)
                 continue;
 
@@ -239,7 +309,9 @@ public class BungeePacketAnalyzer {
 
             modifyCommands(player, sender, packet);
             player.unsafe().sendPacket(packet);
+
         }
+
     }
 
     private static class PacketDecoder extends MessageToMessageDecoder<PacketWrapper> {
@@ -248,23 +320,30 @@ public class BungeePacketAnalyzer {
         private final CommandSender sender;
 
         private PacketDecoder(ProxiedPlayer player) {
+
             this.player = player;
             this.sender = CommandSenderHandler.from(player);
+
         }
 
         @Override
         protected void decode(ChannelHandlerContext channelHandlerContext, PacketWrapper wrapper, List<Object> list) {
+
             if (wrapper.packet == null) {
+
                 list.add(wrapper);
                 return;
+
             }
 
             if (wrapper.packet instanceof PluginMessage) {
+
                 PluginMessage pluginMessage = (PluginMessage) wrapper.packet;
-                if(CustomServerBrand.isEnabled() && CustomServerBrand.isBrandTag(pluginMessage.getTag()))
+                if (CustomServerBrand.isEnabled() && CustomServerBrand.isBrandTag(pluginMessage.getTag()))
                     return;
 
             } else if (wrapper.packet instanceof Commands) {
+
                 Commands response = (Commands) wrapper.packet;
                 modifyCommands(player, sender, response);
 
@@ -272,92 +351,91 @@ public class BungeePacketAnalyzer {
                 return;
 
                 /*
-            } else if (wrapper.packet instanceof TabCompleteResponse) {
-                TabCompleteResponse response = (TabCompleteResponse) wrapper.packet;
-                String serverName = player.getServer().getInfo().getName();
-
-                System.out.println("damn");
-
-                if (!Storage.Blacklist.isDisabledServer(serverName) && player.getPendingConnection().getVersion() < 754) {
-                    if (!PermissionUtil.hasBypassPermission(player)) {
-
-                        System.out.println("Further!");
-                        System.out.println("Got: " + PLAYER_INPUT_CACHE.get(player.getUniqueId()));
-
-                        if (!PLAYER_INPUT_CACHE.contains(player.getUniqueId()))
-                            return;
-
-                        boolean cancelsBeforeHand = false;
-
-                        String rawPlayerInput = PLAYER_INPUT_CACHE.get(player.getUniqueId());
-                        int spaces = rawPlayerInput.contains(" ") ? rawPlayerInput.split(" ").length : 0;
-
-                        String playerInput = StringUtils.getFirstArg(rawPlayerInput),
-                                server = player.getServer().getInfo().getName();
-
-                        System.out.println("NETTY -> " + playerInput);
-
-                        if (!playerInput.equals("/")) {
-                            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.replaceFirst(playerInput, "/", ""), server);
-
-                            if (!cancelsBeforeHand)
-                                cancelsBeforeHand = !Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", "")) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", ""));
-                        }
-
-                        final String cursor = playerInput;
-
-                        if (cursor.startsWith("/")) {
-                            if (spaces == 0) {
-                                List<String> suggestions = new ArrayList<>(response.getCommands());
-
-                                if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-                                    setPluginCommands();
-
-                                    Storage.Blacklist.getServerBlacklists(server).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !suggestions.contains("/" + command)).forEach(command -> {
-                                        if (BungeePacketAnalyzer.PLUGIN_COMMANDS.contains(command))
-                                            suggestions.add("/" + command);
-                                    }));
-
-                                    BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command -> !suggestions.contains(command)).forEach(command -> {
-                                        if (command.startsWith("/")) 
-                                            command = StringUtils.replaceFirst(command, "/", "");
-                                        
-                                        if (Storage.Blacklist.canPlayerAccessTab(player, command, server)) {
-                                            suggestions.add("/" + command);
-                                        }
-                                    });
-
-                                    suggestions.stream().filter(suggestion -> suggestion.startsWith(cursor) && !response.getCommands().contains(suggestion)).forEach(command -> response.getCommands().add(command));
-
-                                } else {
-                                    BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command -> !suggestions.contains(command)).forEach(suggestions::add);
-
-                                    suggestions.removeIf(command -> {
-                                        if (command.startsWith("/"))
-                                            command = StringUtils.replaceFirst(command, "/", "");
-
-                                        return !Storage.Blacklist.canPlayerAccessTab(player, command, server);
-                                    });
-
-                                    response.getCommands().clear();
-                                    suggestions.forEach(command -> response.getCommands().add(command));
-                                }
-
-                                if (response.getCommands().isEmpty())
-                                    return;
-
-                            } else {
-                                if (cancelsBeforeHand)
-                                    return;
-                            }
-
-                            player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
-                        }
-                    }
-                }*/
+                 * } else if (wrapper.packet instanceof TabCompleteResponse) {
+                 * TabCompleteResponse response = (TabCompleteResponse) wrapper.packet; String
+                 * serverName = player.getServer().getInfo().getName();
+                 * 
+                 * System.out.println("damn");
+                 * 
+                 * if (!Storage.Blacklist.isDisabledServer(serverName) &&
+                 * player.getPendingConnection().getVersion() < 754) { if
+                 * (!PermissionUtil.hasBypassPermission(player)) {
+                 * 
+                 * System.out.println("Further!"); System.out.println("Got: " +
+                 * PLAYER_INPUT_CACHE.get(player.getUniqueId()));
+                 * 
+                 * if (!PLAYER_INPUT_CACHE.contains(player.getUniqueId())) return;
+                 * 
+                 * boolean cancelsBeforeHand = false;
+                 * 
+                 * String rawPlayerInput = PLAYER_INPUT_CACHE.get(player.getUniqueId()); int
+                 * spaces = rawPlayerInput.contains(" ") ? rawPlayerInput.split(" ").length : 0;
+                 * 
+                 * String playerInput = StringUtils.getFirstArg(rawPlayerInput), server =
+                 * player.getServer().getInfo().getName();
+                 * 
+                 * System.out.println("NETTY -> " + playerInput);
+                 * 
+                 * if (!playerInput.equals("/")) { cancelsBeforeHand =
+                 * !Storage.Blacklist.canPlayerAccessTab(player,
+                 * StringUtils.replaceFirst(playerInput, "/", ""), server);
+                 * 
+                 * if (!cancelsBeforeHand) cancelsBeforeHand =
+                 * !Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.
+                 * replaceFirst(playerInput, "/", "")) ||
+                 * Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.
+                 * replaceFirst(playerInput, "/", "")); }
+                 * 
+                 * final String cursor = playerInput;
+                 * 
+                 * if (cursor.startsWith("/")) { if (spaces == 0) { List<String> suggestions =
+                 * new ArrayList<>(response.getCommands());
+                 * 
+                 * if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+                 * setPluginCommands();
+                 * 
+                 * Storage.Blacklist.getServerBlacklists(server).forEach(blacklist ->
+                 * blacklist.getCommands().stream().filter(command -> !suggestions.contains("/"
+                 * + command)).forEach(command -> { if
+                 * (BungeePacketAnalyzer.PLUGIN_COMMANDS.contains(command)) suggestions.add("/"
+                 * + command); }));
+                 * 
+                 * BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command ->
+                 * !suggestions.contains(command)).forEach(command -> { if
+                 * (command.startsWith("/")) command = StringUtils.replaceFirst(command, "/",
+                 * "");
+                 * 
+                 * if (Storage.Blacklist.canPlayerAccessTab(player, command, server)) {
+                 * suggestions.add("/" + command); } });
+                 * 
+                 * suggestions.stream().filter(suggestion -> suggestion.startsWith(cursor) &&
+                 * !response.getCommands().contains(suggestion)).forEach(command ->
+                 * response.getCommands().add(command));
+                 * 
+                 * } else { BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command ->
+                 * !suggestions.contains(command)).forEach(suggestions::add);
+                 * 
+                 * suggestions.removeIf(command -> { if (command.startsWith("/")) command =
+                 * StringUtils.replaceFirst(command, "/", "");
+                 * 
+                 * return !Storage.Blacklist.canPlayerAccessTab(player, command, server); });
+                 * 
+                 * response.getCommands().clear(); suggestions.forEach(command ->
+                 * response.getCommands().add(command)); }
+                 * 
+                 * if (response.getCommands().isEmpty()) return;
+                 * 
+                 * } else { if (cancelsBeforeHand) return; }
+                 * 
+                 * player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
+                 * } } }
+                 */
             }
 
             list.add(wrapper);
+
         }
+
     }
+
 }

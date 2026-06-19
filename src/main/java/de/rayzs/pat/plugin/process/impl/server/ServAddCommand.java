@@ -15,13 +15,12 @@ import java.util.List;
 public class ServAddCommand extends ProCommand {
 
     public ServAddCommand() {
-        super(
-                "add",
-                ""
-        );
+
+        super("add", "");
 
         proxyOnly = true;
         serverCommand = true;
+
     }
 
     @Override
@@ -37,20 +36,25 @@ public class ServAddCommand extends ProCommand {
         String command = fullString;
 
         if (!command.startsWith("\"")) {
+
             command = args[0];
+
         } else {
 
             command = command.substring(1);
             int lastIndex = command.indexOf("\"");
 
             if (lastIndex == -1) {
+
                 return false;
+
             }
 
             command = command.substring(0, lastIndex);
 
             fullString = fullString.replace("\"" + command + "\"", ":::");
             args = fullString.split(" ");
+
         }
 
         command = StringUtils.replaceTriggers(command, "", "\\.", "'", "\"");
@@ -64,26 +68,24 @@ public class ServAddCommand extends ProCommand {
 
             GeneralBlacklist blacklist = Storage.Blacklist.getServerBlacklist(serverName);
 
-            boolean exist = command.contains(" ")
-                    ? blacklist.getCommands().contains(command)
+            boolean exist = command.contains(" ") ? blacklist.getCommands().contains(command)
                     : blacklist.isListed(command);
 
             if (!exist) {
+
                 blacklist.add(command).save();
                 Storage.handleChange(serverName);
+
             }
 
-            String message = exist
-                    ? Storage.ConfigSections.Messages.BLACKLIST.ADD_SERVER_FAILED
+            String message = exist ? Storage.ConfigSections.Messages.BLACKLIST.ADD_SERVER_FAILED
                     : Storage.ConfigSections.Messages.BLACKLIST.ADD_SERVER_SUCCESS;
 
-            message = StringUtils.replace(message,
-                    "%command%", command,
-                    "%server%", serverName
-            );
+            message = StringUtils.replace(message, "%command%", command, "%server%", serverName);
 
             sender.sendMessage(message);
             return true;
+
         }
 
         String groupName = args[1];
@@ -93,42 +95,40 @@ public class ServAddCommand extends ProCommand {
 
             String message = Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST_SERVER;
 
-            message = StringUtils.replace(message,
-                    "%group%", groupName,
-                    "%server%", serverName
-            );
+            message = StringUtils.replace(message, "%group%", groupName, "%server%", serverName);
 
             sender.sendMessage(message);
             return true;
+
         }
 
         GroupBlacklist groupBlacklist = group.getOrCreateGroupBlacklist(serverName);
         boolean exist = groupBlacklist != null && groupBlacklist.getCommands().contains(command);
 
         if (!exist) {
+
             group.add(command, serverName);
             Storage.handleChange(serverName);
+
         }
 
-        String message = exist
-                ? Storage.ConfigSections.Messages.GROUP.ADD_SERVER_FAILED
+        String message = exist ? Storage.ConfigSections.Messages.GROUP.ADD_SERVER_FAILED
                 : Storage.ConfigSections.Messages.GROUP.ADD_SERVER_SUCCESS;
 
-        message = StringUtils.replace(message,
-                "%group%", groupName,
-                "%command%", command,
-                "%server%", serverName
-        );
+        message = StringUtils.replace(message, "%group%", groupName, "%command%", command, "%server%", serverName);
 
         sender.sendMessage(message);
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
 
         if (args.length < 2) {
+
             return Storage.getServers(true);
+
         }
 
         args = Arrays.copyOfRange(args, 1, args.length);
@@ -137,19 +137,25 @@ public class ServAddCommand extends ProCommand {
         String command = fullString;
 
         if (args[0].startsWith("\"")) {
+
             command = command.length() == 1 ? "" : command.substring(1, command.length() - 1);
 
             int lastIndex = command.indexOf("\"");
 
             if (lastIndex == -1) {
+
                 return null;
+
             }
 
             command = command.substring(0, lastIndex);
             args = Arrays.copyOfRange(args, command.split(" ").length - 1, args.length);
+
         }
 
         final int length = args.length;
         return length == 2 ? GroupManager.getGroupNames() : null;
+
     }
+
 }

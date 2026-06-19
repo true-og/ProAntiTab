@@ -9,16 +9,21 @@ public class UpdateGroupsPerServerSection extends ConfigStorage {
     public boolean ENABLED = false;
 
     public UpdateGroupsPerServerSection() {
+
         super("update-groups-per-server");
+
     }
 
     @Override
     public void load() {
+
         super.load();
 
         if (!Reflection.isProxyServer())
             return;
 
         ENABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
+
     }
+
 }

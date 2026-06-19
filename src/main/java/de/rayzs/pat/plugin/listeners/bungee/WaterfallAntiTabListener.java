@@ -25,8 +25,11 @@ public class WaterfallAntiTabListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onProxyDefineCommands(ProxyDefineCommandsEvent event) {
+
         if (!(event.getReceiver() instanceof ProxiedPlayer) || event.getCommands().isEmpty()) {
+
             return;
+
         }
 
         final ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
@@ -34,14 +37,18 @@ public class WaterfallAntiTabListener implements Listener {
         final String serverName = player.getServer().getInfo().getName();
 
         if (Storage.Blacklist.isDisabledServer(serverName) || PermissionUtil.hasBypassPermission(sender)) {
+
             return;
+
         }
 
         final List<Group> groups = GroupManager.getPlayerGroups(sender);
         final Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
 
         if (!cache.containsKey(serverName)) {
+
             cache.put(serverName, new CommandsCache());
+
         }
 
         final CommandsCache commandsCache = cache.get(serverName);
@@ -54,21 +61,30 @@ public class WaterfallAntiTabListener implements Listener {
         List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName);
         event.getCommands().entrySet().removeIf(command -> {
 
-            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command.getKey()) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command.getKey())) {
+            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command.getKey())
+                    || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command.getKey()))
+            {
+
                 return false;
+
             }
 
             return playerCommands.contains(command.getKey());
+
         });
 
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, new ArrayList<>(event.getCommands().keySet()));
-        if (filteredSuggestionEvent.isCancelled()) event.getCommands().clear();
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player,
+                new ArrayList<>(event.getCommands().keySet()));
+        if (filteredSuggestionEvent.isCancelled())
+            event.getCommands().clear();
 
         for (String commandName : filteredSuggestionEvent.getSuggestions()) {
 
-            if (!event.getCommands().containsKey(commandName)) 
+            if (!event.getCommands().containsKey(commandName))
                 event.getCommands().put(commandName, commandsMap.get(commandName));
-        
+
         }
+
     }
+
 }

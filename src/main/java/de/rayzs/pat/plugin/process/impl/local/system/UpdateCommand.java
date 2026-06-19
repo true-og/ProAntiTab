@@ -14,34 +14,44 @@ import java.util.*;
 public class UpdateCommand extends ProCommand {
 
     public UpdateCommand() {
-        super(
-                "update",
-                ""
-        );
+
+        super("update", "");
+
     }
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
+
         if (args.length == 0) {
+
             Storage.getLoader().getOnlinePlayerNames().forEach(name -> {
+
                 Object playerObj = Storage.getLoader().getPlayerObjByName(name);
 
                 if (playerObj != null) {
+
                     CommandSender s = CommandSenderHandler.from(playerObj);
 
                     assert s != null;
                     PermissionUtil.reloadPermissions(s);
+
                 }
+
             });
 
             if (!Reflection.isProxyServer() && Reflection.isAtLeast(1, 13)) {
+
                 BukkitAntiTabListener.handleTabCompletion();
+
             } else if (Reflection.isProxyServer()) {
+
                 Communicator.Proxy2Backend.sendUpdateCommand();
+
             }
 
             sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_ALL);
             return true;
+
         }
 
         String name = args[0];
@@ -52,11 +62,12 @@ public class UpdateCommand extends ProCommand {
         boolean exist = targetSender != null;
 
         if (exist) {
+
             name = targetSender.getName();
+
         }
 
-        String message = exist
-                ? Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_SPECIFIC
+        String message = exist ? Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_SPECIFIC
                 : Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.PLAYER_NOT_ONLINE;
 
         message = message.replace("%target%", name);
@@ -66,19 +77,27 @@ public class UpdateCommand extends ProCommand {
             PermissionUtil.reloadPermissions(targetSender);
 
             if (!Reflection.isProxyServer() && Reflection.isAtLeast(1, 13)) {
+
                 BukkitAntiTabListener.handleTabCompletion(uuid);
+
             } else if (Reflection.isProxyServer()) {
+
                 Communicator.Proxy2Backend.sendUpdateCommand(uuid, targetSender.getServerName());
+
             }
 
         }
 
         sender.sendMessage(message);
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
+
         return args.length < 2 ? Storage.getLoader().getOnlinePlayerNames() : null;
+
     }
+
 }

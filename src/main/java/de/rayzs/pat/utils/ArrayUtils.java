@@ -5,11 +5,14 @@ import java.util.*;
 public class ArrayUtils {
 
     public static boolean containsIgnoreCase(List<String> list, String element) {
+
         return list.stream().anyMatch(element::equalsIgnoreCase);
+
     }
 
     public static boolean compareStringArrays(List<String> listA, List<String> listB) {
-        if(listA == null || listB == null)
+
+        if (listA == null || listB == null)
             return false;
 
         if (listA.size() != listB.size())
@@ -23,10 +26,14 @@ public class ArrayUtils {
 
         final int length = listA.size();
         for (int i = 0; i < length; i++) {
+
             if (!listA.get(i).equalsIgnoreCase(listB.get(i)))
                 return false;
+
         }
 
         return true;
+
     }
+
 }

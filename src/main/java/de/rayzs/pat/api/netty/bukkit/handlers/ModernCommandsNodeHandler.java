@@ -5,18 +5,24 @@ import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.utils.node.BukkitCommandNodeHelper;
 import de.rayzs.pat.utils.sender.CommandSender;
 import org.bukkit.entity.Player;
+
 public class ModernCommandsNodeHandler implements BukkitPacketHandler {
 
     public boolean handleIncomingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
+
         // Ignored
         return true;
+
     }
 
     @Override
     public boolean handleOutgoingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
+
         final BukkitCommandNodeHelper helper = new BukkitCommandNodeHelper(packetObj);
 
         SubArguments.handleCommandNode(player.getUniqueId(), helper);
         return true;
+
     }
+
 }

@@ -13,8 +13,9 @@ public class Configurator {
     private static final String FILE_PATH = "./plugins/ProAntiTab";
 
     public static ConfigurationBuilder get(String fileName, String filePath) {
+
         String keyName = filePath + "/" + fileName;
-        if(CONFIGURATION_HASHES.containsKey(keyName))
+        if (CONFIGURATION_HASHES.containsKey(keyName))
             return CONFIGURATION_HASHES.get(keyName);
 
         ConfigurationBuilder configurationBuilder = Reflection.isProxyServer()
@@ -22,37 +23,50 @@ public class Configurator {
                 : new BukkitConfigurationBuilder(fileName, filePath);
         CONFIGURATION_HASHES.put(keyName, configurationBuilder);
         return configurationBuilder;
+
     }
 
     public static ConfigurationBuilder get(String fileName) {
+
         String keyName = FILE_PATH + "/" + fileName;
-        if(CONFIGURATION_HASHES.containsKey(keyName))
+        if (CONFIGURATION_HASHES.containsKey(keyName))
             return CONFIGURATION_HASHES.get(keyName);
 
-        ConfigurationBuilder configurationBuilder = Reflection.isProxyServer()
-                ? new ProxyConfigurationBuilder(fileName)
+        ConfigurationBuilder configurationBuilder = Reflection.isProxyServer() ? new ProxyConfigurationBuilder(fileName)
                 : new BukkitConfigurationBuilder(fileName);
         CONFIGURATION_HASHES.put(keyName, configurationBuilder);
         return configurationBuilder;
+
     }
 
     public static InputStream getResource(String filename) {
+
         try {
+
             URL url = Configurator.class.getClassLoader().getResource(filename);
             if (url == null) {
+
                 return null;
+
             } else {
+
                 URLConnection connection = url.openConnection();
                 connection.setUseCaches(false);
                 return connection.getInputStream();
+
             }
+
         } catch (Throwable throwable) {
+
             throwable.printStackTrace();
             return null;
+
         }
+
     }
 
     public static void createResourcedFile(String resourcePath, String exportResourcePath, boolean replace) {
+
         if (resourcePath == null || resourcePath.isEmpty())
             return;
 
@@ -69,19 +83,27 @@ public class Configurator {
             dataFolder.mkdirs();
 
         try {
+
             if (!outputFile.exists() || replace) {
+
                 OutputStream outputStream = new FileOutputStream(outputFile);
                 byte[] buffer = new byte[1024];
                 int length;
 
-                while((length = inputStream.read(buffer)) > 0)
+                while ((length = inputStream.read(buffer)) > 0)
                     outputStream.write(buffer, 0, length);
 
                 outputStream.close();
                 inputStream.close();
+
             }
+
         } catch (Throwable throwable) {
+
             throwable.printStackTrace();
+
         }
+
     }
+
 }

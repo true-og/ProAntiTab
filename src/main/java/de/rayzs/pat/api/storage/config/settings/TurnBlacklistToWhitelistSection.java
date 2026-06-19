@@ -8,12 +8,17 @@ public class TurnBlacklistToWhitelistSection extends ConfigStorage {
     public boolean ENABLED;
 
     public TurnBlacklistToWhitelistSection() {
+
         super("turn-blacklist-to-whitelist");
+
     }
 
     @Override
     public void load() {
+
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
+
     }
+
 }

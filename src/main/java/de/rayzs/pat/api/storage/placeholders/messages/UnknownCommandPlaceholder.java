@@ -7,11 +7,20 @@ import org.bukkit.entity.Player;
 
 public class UnknownCommandPlaceholder extends PlaceholderStorage {
 
-    public UnknownCommandPlaceholder() { super("message_unknowncommand"); }
+    public UnknownCommandPlaceholder() {
+
+        super("message_unknowncommand");
+
+    }
 
     @Override
     public String onRequest(Player player, String param) {
-        if (Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE == null) return null;
-        return StringUtils.getStringList(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE.getLines(), "\n");
+
+        if (Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE == null)
+            return null;
+        return StringUtils.getStringList(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE.getLines(),
+                "\n");
+
     }
+
 }

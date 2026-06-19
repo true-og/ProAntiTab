@@ -8,18 +8,27 @@ import org.bukkit.entity.Player;
 
 public class ListGroupsSortedPlaceholder extends PlaceholderStorage {
 
-    public ListGroupsSortedPlaceholder() { super("list_sorted_groups"); }
+    public ListGroupsSortedPlaceholder() {
+
+        super("list_sorted_groups");
+
+    }
 
     public String SPLITTER;
 
     @Override
     public String onRequest(Player player, String param) {
+
         return StringUtils.getSortedStringList(GroupManager.getGroupNames(), SPLITTER);
+
     }
 
     @Override
     public void load() {
+
         super.load();
         SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7, &e").getOrSet();
+
     }
+
 }

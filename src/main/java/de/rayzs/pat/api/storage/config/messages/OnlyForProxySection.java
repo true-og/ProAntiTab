@@ -9,13 +9,20 @@ public class OnlyForProxySection extends ConfigStorage {
     public String MESSAGE;
 
     public OnlyForProxySection() {
+
         super("only-for-proxy");
+
     }
 
     @Override
     public void load() {
+
         super.load();
-        if(Reflection.isProxyServer()) return;
-        MESSAGE = new ConfigSectionHelper<String>(this, null, "&cThis command works on Bungeecord/Velocity servers only!").getOrSet();
+        if (Reflection.isProxyServer())
+            return;
+        MESSAGE = new ConfigSectionHelper<String>(this, null,
+                "&cThis command works on Bungeecord/Velocity servers only!").getOrSet();
+
     }
+
 }

@@ -7,11 +7,20 @@ import org.bukkit.entity.Player;
 
 public class BlockedSubCommandPlaceholder extends PlaceholderStorage {
 
-    public BlockedSubCommandPlaceholder() { super("message_sub_blocked"); }
+    public BlockedSubCommandPlaceholder() {
+
+        super("message_sub_blocked");
+
+    }
 
     @Override
     public String onRequest(Player player, String param) {
-        if (Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE == null) return null;
-        return StringUtils.getStringList(Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE.getLines(), "\n");
+
+        if (Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE == null)
+            return null;
+        return StringUtils.getStringList(Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE.getLines(),
+                "\n");
+
     }
+
 }

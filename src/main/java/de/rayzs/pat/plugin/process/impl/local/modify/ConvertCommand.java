@@ -12,10 +12,9 @@ import java.util.List;
 public class ConvertCommand extends ProCommand {
 
     public ConvertCommand() {
-        super(
-                "convert",
-                ""
-        );
+
+        super("convert", "");
+
     }
 
     @Override
@@ -27,25 +26,29 @@ public class ConvertCommand extends ProCommand {
         String converterName = args[0];
         Converter converter = StorageConverter.getConverter(converterName);
         if (converter == null) {
+
             sender.sendMessage(StringUtils.replace(Storage.ConfigSections.Messages.CONVERT.INVALID_CONVERTER,
-                    "%converter%", converterName)
-            );
+                    "%converter%", converterName));
 
             return true;
+
         }
 
         converterName = converter.getPluginName();
-        sender.sendMessage(StringUtils.replace(Storage.ConfigSections.Messages.CONVERT.SUCCESS,
-                "%converter%", converterName)
-        );
+        sender.sendMessage(
+                StringUtils.replace(Storage.ConfigSections.Messages.CONVERT.SUCCESS, "%converter%", converterName));
 
         converter.apply(sender);
         Storage.reload();
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
+
         return StorageConverter.getConverters().stream().toList();
+
     }
+
 }

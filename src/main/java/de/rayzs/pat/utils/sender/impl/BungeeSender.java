@@ -20,9 +20,11 @@ public class BungeeSender extends CommandSenderAbstract {
     private final boolean console;
 
     public BungeeSender(Object senderObj) {
+
         super(senderObj);
 
         if (senderObj instanceof UUID uuid) {
+
             final ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
             this.uuid = uuid;
             this.console = false;
@@ -30,85 +32,116 @@ public class BungeeSender extends CommandSenderAbstract {
             this.sender = proxiedPlayer;
             this.name = proxiedPlayer.getName();
             return;
+
         }
 
         if (senderObj instanceof ProxiedPlayer player) {
+
             this.sender = player;
 
             this.name = player.getName();
             this.uuid = player.getUniqueId();
             this.console = false;
             return;
+
         }
 
         this.sender = (CommandSender) senderObj;
 
         if (sender != null) {
+
             this.name = sender.getName();
             this.uuid = CommandSenderHandler.CONSOLE_UUID;
+
         } else {
+
             this.name = null;
             this.uuid = null;
+
         }
 
         this.console = true;
+
     }
 
     @Override
     public void updateSenderObject(Object senderObj) {
+
         super.updateSenderObject(senderObj);
 
         if (senderObj instanceof ProxiedPlayer player) {
+
             sender = player;
+
         } else if (senderObj instanceof CommandSender commandSender) {
+
             sender = commandSender;
+
         }
+
     }
 
     @Override
     public boolean isConsole() {
+
         return this.console;
+
     }
 
     @Override
     public boolean isPlayer() {
+
         return !this.console;
+
     }
 
     @Override
     public boolean isOperator() {
+
         return false;
+
     }
 
     @Override
     public boolean hasPermission(String permission) {
+
         return sender.hasPermission(permission);
+
     }
 
     @Override
     public UUID getUniqueId() {
+
         return this.uuid;
+
     }
 
     @Override
     public String getName() {
+
         return this.name;
+
     }
 
     @Override
     public String getServerName() {
-        return console
-                ? Storage.SERVER_NAME
-                : Storage.getLoader().getPlayerServerName(this.uuid);
+
+        return console ? Storage.SERVER_NAME : Storage.getLoader().getPlayerServerName(this.uuid);
+
     }
 
     @Override
     public void sendMessage(String message) {
+
         if (MessageTranslator.isSupported()) {
+
             MessageTranslator.send(sender, message);
             return;
+
         }
 
         sender.sendMessage(MessageTranslator.replaceMessage(sender, message));
+
     }
+
 }

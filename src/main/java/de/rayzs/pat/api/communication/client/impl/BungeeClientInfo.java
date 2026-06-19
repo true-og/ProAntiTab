@@ -11,26 +11,36 @@ import java.util.UUID;
 public class BungeeClientInfo extends ClientInfo {
 
     public BungeeClientInfo(UUID id) {
+
         super(id);
+
     }
 
     public BungeeClientInfo(UUID id, String name) {
+
         super(id, name);
+
     }
 
     @Override
     public void send(CommunicationPackets.PATPacket packet) {
+
         final byte[] preparedPacket = CommunicationPackets.preparePacket(packet, getId());
 
         if (preparedPacket == null) {
+
             return;
+
         }
 
         final ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(getServerName());
 
         if (serverInfo != null) {
-            serverInfo.sendData(Client.CHANNEL_NAME, preparedPacket);
-        }
-    }
-}
 
+            serverInfo.sendData(Client.CHANNEL_NAME, preparedPacket);
+
+        }
+
+    }
+
+}

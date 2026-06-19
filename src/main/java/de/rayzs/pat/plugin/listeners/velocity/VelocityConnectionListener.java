@@ -26,91 +26,116 @@ public class VelocityConnectionListener {
     private final VelocityLoader loader;
 
     public VelocityConnectionListener(ProxyServer server, VelocityLoader loader) {
+
         this.server = server;
         this.loader = loader;
+
     }
 
     @Subscribe
     public void onServerPreConnect(ServerPreConnectEvent event) {
+
         final Player player = event.getPlayer();
         final CommandSender sender = CommandSenderHandler.from(player);
 
         sender.updateSenderObject(player);
 
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
+
             final ServerInfo serverInfo = event.getOriginalServer().getServerInfo();
-            if (serverInfo != null) Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
+            if (serverInfo != null)
+                Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
+
         }
 
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
-        if(CustomServerBrand.isEnabled())
+        if (CustomServerBrand.isEnabled())
             server.getScheduler().buildTask(loader, () -> {
-                if (player.isActive()) CustomServerBrand.sendBrandToPlayer(player);
+
+                if (player.isActive())
+                    CustomServerBrand.sendBrandToPlayer(player);
+
             }).delay(500, TimeUnit.MILLISECONDS).schedule();
 
         PermissionUtil.setPlayerPermissions(sender);
 
         if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate")) {
+
             server.getScheduler().buildTask(loader, () -> {
+
                 if (player.isActive())
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getUsername());
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%",
+                            player.getUsername());
+
             }).delay(1, TimeUnit.SECONDS).schedule();
+
         }
+
     }
 
     @Subscribe
     public void onServerSwitch(ServerConnectedEvent event) {
+
         final Player player = event.getPlayer();
 
         if (!VelocityPacketAnalyzer.isInjected(player)) {
 
             if (!VelocityPacketAnalyzer.inject(player)) {
+
                 server.getScheduler().buildTask(loader, () -> {
+
                     if (!VelocityPacketAnalyzer.inject(player)) {
 
                         if (Storage.ConfigSections.Settings.INJECTION_FAILED.ENABLED) {
 
-                            Logger.info(MessageTranslator.replaceMessage(
-                                    player,
-                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE
-                            ));
+                            Logger.info(MessageTranslator.replaceMessage(player,
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE));
 
-                            player.disconnect(Component.text(
-                                    MessageTranslator.replaceMessage(
-                                            player,
-                                            Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE
-                                    )
-                            ));
+                            player.disconnect(Component.text(MessageTranslator.replaceMessage(player,
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE)));
+
                         }
+
                     }
 
                 }).delay(1, TimeUnit.SECONDS).schedule();
+
             }
+
         }
 
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
+
             final ServerInfo serverInfo = event.getServer().getServerInfo();
-            if (serverInfo != null) Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
+            if (serverInfo != null)
+                Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
 
             CommandSender sender = CommandSenderHandler.from(player);
             assert sender != null;
             PermissionUtil.reloadPermissions(sender);
+
         }
 
         if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) {
+
             return;
+
         }
 
         CustomServerBrand.sendBrandToPlayer(player);
+
     }
 
     @Subscribe
     public void onDisconnect(DisconnectEvent event) {
+
         Player player = event.getPlayer();
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.LEFT);
 
         PermissionUtil.resetPermissions(player.getUniqueId());
         VelocityPacketAnalyzer.uninject(player);
+
     }
+
 }

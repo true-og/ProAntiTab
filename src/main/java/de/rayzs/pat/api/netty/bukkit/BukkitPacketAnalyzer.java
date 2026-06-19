@@ -23,21 +23,27 @@ public class BukkitPacketAnalyzer {
 
     private static final String HANDLER_NAME = "pat-bukkit-handler", PIPELINE_NAME = "packet_handler";
 
-    private static final BukkitPacketHandler PACKET_HANDLER = Reflection.isAtLeast(1, 16) ? new ModernPacketHandler() : new LegacyPacketHandler();
+    private static final BukkitPacketHandler PACKET_HANDLER = Reflection.isAtLeast(1, 16) ? new ModernPacketHandler()
+            : new LegacyPacketHandler();
     private static final BukkitPacketHandler COMMANDS_NODE_HANDLER = new ModernCommandsNodeHandler();
 
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
     public static void injectAll() {
+
         Bukkit.getOnlinePlayers().forEach(BukkitPacketAnalyzer::inject);
+
     }
 
     public static void uninjectAll() {
+
         BukkitPacketAnalyzer.INJECTED_PLAYERS.keySet().forEach(BukkitPacketAnalyzer::uninject);
         BukkitPacketAnalyzer.INJECTED_PLAYERS.clear();
+
     }
 
     public static void sendPacket(UUID uuid, Object object) {
+
         Channel channel = INJECTED_PLAYERS.get(uuid);
 
         if (channel == null)
@@ -45,37 +51,51 @@ public class BukkitPacketAnalyzer {
 
         SENT_PACKET.put(uuid, object);
         channel.pipeline().writeAndFlush(object);
+
     }
 
     public static boolean inject(Player player) {
+
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             return true;
 
         try {
+
             Channel channel = Reflection.getPlayerChannel(player);
 
             if (channel == null) {
+
                 return false;
+
             }
 
             if (channel.pipeline().names().contains(BukkitPacketAnalyzer.HANDLER_NAME))
                 uninject(channel);
 
-            channel.pipeline().addBefore(BukkitPacketAnalyzer.PIPELINE_NAME, BukkitPacketAnalyzer.HANDLER_NAME, new PacketDecoder(player));
+            channel.pipeline().addBefore(BukkitPacketAnalyzer.PIPELINE_NAME, BukkitPacketAnalyzer.HANDLER_NAME,
+                    new PacketDecoder(player));
             BukkitPacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
+
         } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+
             Reflection.toggleInjectionMethod();
             boolean success = inject(player);
 
             if (!success) {
-                Logger.warning("Both injection methods failed! Please report this back to me on my Discord! (https://www.rayzs.de/discord)");
+
+                Logger.warning(
+                        "Both injection methods failed! Please report this back to me on my Discord! (https://www.rayzs.de/discord)");
+
             }
 
             return success;
 
         } catch (Exception exception) {
+
             if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
+
                 exception.printStackTrace();
+
             }
 
             return false;
@@ -83,40 +103,55 @@ public class BukkitPacketAnalyzer {
         }
 
         return true;
+
     }
 
     public static void uninject(UUID uuid) {
+
         if (Storage.SEND_CONSOLE_NOTIFICATION)
             return;
 
         if (BukkitPacketAnalyzer.INJECTED_PLAYERS.containsKey(uuid)) {
+
             Channel channel = BukkitPacketAnalyzer.INJECTED_PLAYERS.get(uuid);
             uninject(channel);
+
         }
+
     }
 
     public static void uninject(Channel channel) {
+
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             return;
 
         if (channel != null) {
+
             channel.eventLoop().submit(() -> {
+
                 ChannelPipeline pipeline = channel.pipeline();
 
                 if (pipeline.names().contains(BukkitPacketAnalyzer.HANDLER_NAME))
                     pipeline.remove(BukkitPacketAnalyzer.HANDLER_NAME);
+
             });
+
         }
+
     }
 
     public static String getPlayerInput(Player player) {
+
         String input = PLAYER_INPUT_CACHE.get(player);
         PLAYER_INPUT_CACHE.remove(player);
         return input;
+
     }
 
     public static void insertPlayerInput(Player player, String text) {
+
         PLAYER_INPUT_CACHE.put(player, text);
+
     }
 
     private static class PacketDecoder extends ChannelDuplexHandler {
@@ -125,70 +160,98 @@ public class BukkitPacketAnalyzer {
         private final CommandSender sender;
 
         private PacketDecoder(Player player) {
+
             this.player = player;
             this.sender = CommandSenderHandler.from(player);
+
         }
 
         @Override
         public void channelRead(ChannelHandlerContext channel, Object packetObj) {
+
             try {
+
                 if (packetObj.getClass() == null || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+
                     super.channelRead(channel, packetObj);
                     return;
+
                 }
 
                 String packetName = packetObj.getClass().getSimpleName();
 
-                if (!packetName.equals("PacketPlayInTabComplete") && !packetName.equals("ServerboundCommandSuggestionPacket")) {
+                if (!packetName.equals("PacketPlayInTabComplete")
+                        && !packetName.equals("ServerboundCommandSuggestionPacket"))
+                {
+
                     super.channelRead(channel, packetObj);
                     return;
+
                 }
 
                 if (!PermissionUtil.hasBypassPermission(sender)) {
 
                     if (!PACKET_HANDLER.handleIncomingPacket(player, sender, packetObj))
                         return;
+
                 }
 
-
                 super.channelRead(channel, packetObj);
-            } catch (Throwable exception) { exception.printStackTrace(); }
+
+            } catch (Throwable exception) {
+
+                exception.printStackTrace();
+
+            }
+
         }
 
         @Override
         public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
+
             try {
 
-                if(packetObj.getClass() == null || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+                if (packetObj.getClass() == null || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+
                     super.write(channel, packetObj, promise);
                     return;
+
                 }
 
                 final String packetName = packetObj.getClass().getSimpleName();
                 final boolean isCommandsPacket = packetName.equals("ClientboundCommandsPacket");
-                final boolean isTabCompletePacket = packetName.equals("PacketPlayOutTabComplete") || packetName.equals("ClientboundCommandSuggestionsPacket");
+                final boolean isTabCompletePacket = packetName.equals("PacketPlayOutTabComplete")
+                        || packetName.equals("ClientboundCommandSuggestionsPacket");
 
                 if (!isCommandsPacket && !isTabCompletePacket || PermissionUtil.hasBypassPermission(sender)) {
+
                     super.write(channel, packetObj, promise);
                     return;
+
                 }
 
                 if (isCommandsPacket) {
+
                     COMMANDS_NODE_HANDLER.handleOutgoingPacket(player, sender, packetObj);
 
                     super.write(channel, packetObj, promise);
                     return;
+
                 }
 
                 UUID uuid = player.getUniqueId();
                 Object sentPacketObj = SENT_PACKET.get(uuid);
 
                 if (sentPacketObj != null) {
+
                     if (sentPacketObj == packetObj) {
+
                         SENT_PACKET.remove(uuid);
                         super.write(channel, sentPacketObj, promise);
                         return;
+
                     }
+
                 }
 
                 if (!PACKET_HANDLER.handleOutgoingPacket(player, sender, packetObj))
@@ -197,8 +260,13 @@ public class BukkitPacketAnalyzer {
                 super.write(channel, packetObj, promise);
 
             } catch (Throwable exception) {
+
                 exception.printStackTrace();
+
             }
+
         }
+
     }
+
 }

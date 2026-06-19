@@ -6,7 +6,12 @@ import de.rayzs.pat.utils.Reflection;
 public class bStats {
 
     public static void initialize(Object pluginObj) {
-        if(Reflection.isProxyServer()) new BungeeMetrics(pluginObj, 20090);
-        else new BukkitMetrics(pluginObj, 20089);
+
+        if (Reflection.isProxyServer())
+            new BungeeMetrics(pluginObj, 20090);
+        else
+            new BukkitMetrics(pluginObj, 20089);
+
     }
+
 }

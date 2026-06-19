@@ -19,52 +19,71 @@ import net.md_5.bungee.event.*;
 
 public class BungeePlayerConnectionListener implements Listener {
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPostLogin(PostLoginEvent event) {
+
         final ProxiedPlayer player = event.getPlayer();
         final CommandSender sender = CommandSenderHandler.from(player);
         sender.updateSenderObject(player);
 
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
-        if(CustomServerBrand.isEnabled())
+        if (CustomServerBrand.isEnabled())
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
-                if (player.isConnected()) CustomServerBrand.sendBrandToPlayer(player);
+
+                if (player.isConnected())
+                    CustomServerBrand.sendBrandToPlayer(player);
+
             }, 500, TimeUnit.MILLISECONDS);
 
         PermissionUtil.setPlayerPermissions(sender);
 
         if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate")) {
+
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
+
                 if (player.isConnected()) {
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getName());
+
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%",
+                            player.getName());
+
                 }
+
             }, 1, TimeUnit.SECONDS);
+
         }
+
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onServerSwitch(ServerSwitchEvent event) {
+
         ProxiedPlayer player = event.getPlayer();
 
         BungeePacketAnalyzer.inject(player);
 
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
+
             CommandSender sender = CommandSenderHandler.from(player);
 
             assert sender != null;
             PermissionUtil.reloadPermissions(sender);
+
         }
 
         if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) {
+
             return;
+
         }
 
         CustomServerBrand.sendBrandToPlayer(player);
+
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDisconnectEvent(PlayerDisconnectEvent event) {
+
         ProxiedPlayer player = event.getPlayer();
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.LEFT);
 
@@ -72,9 +91,13 @@ public class BungeePlayerConnectionListener implements Listener {
         BungeePacketAnalyzer.uninject(player);
 
         if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) {
+
             return;
+
         }
 
         CustomServerBrand.sendBrandToPlayer(player);
+
     }
+
 }

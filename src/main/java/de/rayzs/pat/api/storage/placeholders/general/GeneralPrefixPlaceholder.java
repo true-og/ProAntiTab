@@ -6,11 +6,19 @@ import org.bukkit.entity.Player;
 
 public class GeneralPrefixPlaceholder extends PlaceholderStorage {
 
-    public GeneralPrefixPlaceholder() { super("general_prefix"); }
+    public GeneralPrefixPlaceholder() {
+
+        super("general_prefix");
+
+    }
 
     @Override
     public String onRequest(Player player, String param) {
-        if (Storage.ConfigSections.Messages.PREFIX == null) return null;
+
+        if (Storage.ConfigSections.Messages.PREFIX == null)
+            return null;
         return Storage.ConfigSections.Messages.PREFIX.PREFIX;
+
     }
+
 }

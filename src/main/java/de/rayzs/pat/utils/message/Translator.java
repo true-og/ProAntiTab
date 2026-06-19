@@ -20,13 +20,16 @@ public interface Translator {
     void playSound(Object target, String soundKey, float volume, float pitch) throws Exception;
 
     default Component toComponent(String text) {
+
         text = StringUtils.replace(text, "§", "&");
 
         Component legacy = LegacyComponentSerializer.legacyAmpersand().deserialize(text);
         text = StringUtils.replace(miniMessage.serialize(legacy), "\\", "");
 
         return miniMessage.deserialize(text);
+
     }
 
     void close();
+
 }

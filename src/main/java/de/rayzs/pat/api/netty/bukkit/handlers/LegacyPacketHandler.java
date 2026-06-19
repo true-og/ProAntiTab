@@ -23,23 +23,31 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
 
     @Override
     public boolean handleIncomingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
-        Field stringField = Reflection.getFirstFieldByType(packetObj.getClass(), "String", Reflection.SearchOption.ENDS);
-        if(stringField == null) {
+
+        Field stringField = Reflection.getFirstFieldByType(packetObj.getClass(), "String",
+                Reflection.SearchOption.ENDS);
+        if (stringField == null) {
+
             Logger.warning("Failed PacketAnalyze process! (#1)");
             return false;
+
         }
 
         String text = (String) stringField.get(packetObj);
         BukkitPacketAnalyzer.insertPlayerInput(player, text);
         return true;
+
     }
 
     @Override
     public boolean handleOutgoingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
+
         final String rawInput = BukkitPacketAnalyzer.getPlayerInput(player);
 
-        if(rawInput == null) {
+        if (rawInput == null) {
+
             return false;
+
         }
 
         final List<Group> groups = GroupManager.getPlayerGroups(sender);
@@ -48,7 +56,9 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
         boolean cancelsBeforeHand = false;
 
         if (!input.startsWith("/")) {
+
             return true;
+
         }
 
         input = input.substring(1);
@@ -57,23 +67,33 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
         final boolean spaces = input.contains(" ");
 
         if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(input) && !doesBypassNamespace) {
+
             cancelsBeforeHand = true;
+
         }
 
         if (!cancelsBeforeHand && !input.isEmpty()) {
+
             cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.getFirstArg(input));
+
         }
 
         if (!cancelsBeforeHand) {
-            cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(input) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input);
+
+            cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(input)
+                    || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input);
+
         }
 
         for (Field field : Reflection.getFields(packetObj)) {
+
             field.setAccessible(true);
             Object result = field.get(packetObj);
 
             if (!(result instanceof String[])) {
+
                 continue;
+
             }
 
             String[] tR = (String[]) result;
@@ -82,37 +102,57 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
             if (spaces) {
 
                 if (cancelsBeforeHand) {
+
                     suggestions.clear();
                     field.set(packetObj, suggestions.toArray(new String[0]));
                     return true;
+
                 }
 
-                FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawInput, new ArrayList<>(suggestions));
+                FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler
+                        .callFilteredTabCompletionEvents(player.getUniqueId(), rawInput, new ArrayList<>(suggestions));
 
                 if (filteredTabCompletionEvent.isCancelled()) {
+
                     suggestions.clear();
+
                 } else {
+
                     suggestions.removeIf(s -> !filteredTabCompletionEvent.getCompletion().contains(s));
+
                 }
 
             } else {
+
                 suggestions.removeIf(s -> {
+
                     String cpy = s;
                     if (cpy.startsWith("/")) {
+
                         cpy = cpy.substring(1);
+
                     }
 
-                    if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(cpy) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(cpy)) {
+                    if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(cpy)
+                            || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(cpy))
+                    {
+
                         return false;
+
                     }
 
                     return !Storage.Blacklist.canPlayerAccessTab(sender, groups, cpy);
+
                 });
+
             }
 
             field.set(packetObj, suggestions.toArray(new String[0]));
+
         }
 
         return true;
+
     }
+
 }

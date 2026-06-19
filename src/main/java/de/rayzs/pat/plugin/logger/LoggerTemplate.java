@@ -13,4 +13,5 @@ public interface LoggerTemplate {
     void warn(String message);
 
     void send(LoggerPriority priority, String message);
+
 }

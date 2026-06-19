@@ -11,14 +11,17 @@ public class ProxyPlaceholderReplacer {
     private final PlaceholderAPI placeholderAPI;
 
     public ProxyPlaceholderReplacer() {
+
         placeholderAPI = PlaceholderAPI.createInstance();
         placeholderAPI.setRequestTimeout(1500);
+
     }
 
     public boolean process(Object playerObj, String text, Consumer<String> consumer) {
+
         UUID uuid = null;
 
-        if(playerObj != null)
+        if (playerObj != null)
 
             if (playerObj instanceof CommandSender) {
 
@@ -35,13 +38,18 @@ public class ProxyPlaceholderReplacer {
                     uuid = ((net.md_5.bungee.api.connection.ProxiedPlayer) playerObj).getUniqueId();
 
             } else {
+
                 if (playerObj instanceof org.bukkit.entity.Player)
                     uuid = ((org.bukkit.entity.Player) playerObj).getUniqueId();
+
             }
 
-        if(uuid == null) return false;
+        if (uuid == null)
+            return false;
         placeholderAPI.formatPlaceholders(text, uuid).thenAccept(consumer);
 
         return true;
+
     }
+
 }

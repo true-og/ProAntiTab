@@ -12,25 +12,36 @@ import java.util.UUID;
 public class VelocityClientInfo extends ClientInfo {
 
     public VelocityClientInfo(UUID id) {
+
         super(id);
+
     }
 
     public VelocityClientInfo(UUID id, String name) {
+
         super(id, name);
+
     }
 
     @Override
     public void send(CommunicationPackets.PATPacket packet) {
+
         final byte[] preparedPacket = CommunicationPackets.preparePacket(packet, getId());
 
         if (preparedPacket == null) {
+
             return;
+
         }
 
         final Optional<RegisteredServer> optServer = VelocityLoader.getServer().getServer(getServerName());
 
         optServer.ifPresent(registeredServer -> {
+
             registeredServer.sendPluginMessage(VelocityClient.getIdentifier(), preparedPacket);
+
         });
+
     }
+
 }

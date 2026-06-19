@@ -5,13 +5,24 @@ import de.rayzs.pat.api.storage.*;
 public class ConfigStorage extends StorageTemplate {
 
     public ConfigStorage(String navigatePath) {
+
         super(Storage.Files.CONFIGURATION, navigatePath);
         Storage.ConfigSections.SECTIONS.add(this);
+
     }
 
     @Override
-    public void save() { getConfig().save(); }
+    public void save() {
+
+        getConfig().save();
+
+    }
 
     @Override
-    public void load() { getConfig().reload(); }
+    public void load() {
+
+        getConfig().reload();
+
+    }
+
 }

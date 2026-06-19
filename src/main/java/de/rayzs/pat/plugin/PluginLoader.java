@@ -46,8 +46,8 @@ public interface PluginLoader {
 
     /**
      * <pre>
-     * %n = Plugin name
-     * %v = Plugin version
+     * %n = Plugin name %v = Plugin version
      */
     List<String> getPluginNames(String format);
+
 }

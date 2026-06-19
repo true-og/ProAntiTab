@@ -10,14 +10,21 @@ public class CancelCommandSection extends ConfigStorage {
     public MultipleMessagesHelper BASE_COMMAND_RESPONSE, SUB_COMMAND_RESPONSE;
 
     public CancelCommandSection() {
+
         super("cancel-blocked-commands");
+
     }
 
     @Override
     public void load() {
+
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
-        BASE_COMMAND_RESPONSE = new MultipleMessagesHelper(this, "base-command-message", Collections.singletonList("&cThe command %command% is blocked!"));
-        SUB_COMMAND_RESPONSE = new MultipleMessagesHelper(this, "sub-command-message", Collections.singletonList("&cThis sub-argument is blocked!"));
+        BASE_COMMAND_RESPONSE = new MultipleMessagesHelper(this, "base-command-message",
+                Collections.singletonList("&cThe command %command% is blocked!"));
+        SUB_COMMAND_RESPONSE = new MultipleMessagesHelper(this, "sub-command-message",
+                Collections.singletonList("&cThis sub-argument is blocked!"));
+
     }
+
 }

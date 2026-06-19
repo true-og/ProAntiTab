@@ -26,19 +26,24 @@ public class GroupManagerAdapter implements Listener {
     private static GroupManager manager;
 
     public static void initialize(Plugin plugin) {
+
         Logger.info("Successfully hooked into GroupManager for easier usage.");
 
         Storage.setPermissionPlugin(PermissionPlugin.GROUPMANAGER);
         manager = (GroupManager) plugin;
 
         Bukkit.getServer().getPluginManager().registerEvents(new GroupManagerListener(), BukkitLoader.getPlugin());
+
     }
 
     public static void setPermissions(UUID uuid) {
+
         final Player player = Bukkit.getPlayer(uuid);
 
         if (player == null) {
+
             return;
+
         }
 
         final AnjoPermissionsHandler handler = manager.getWorldsHolder().getWorldPermissions(player);
@@ -47,27 +52,40 @@ public class GroupManagerAdapter implements Listener {
                 .forEach(permission -> PermissionUtil.setPermission(uuid, permission, true));
 
         if (Reflection.isAtLeast(1, 13)) {
+
             BukkitAntiTabListener.handleTabCompletion(uuid);
+
         }
+
     }
 
     private static class GroupManagerListener implements Listener {
 
         @EventHandler
         public void onGMUser(GMUserEvent event) {
+
             PATScheduler.createScheduler(() -> {
+
                 PermissionUtil.reloadPermissions(event.getUser().getBukkitPlayer().getUniqueId());
+
             }, 10);
+
         }
 
         @EventHandler
         public void onGMGroup(GMGroupEvent event) {
+
             PATScheduler.createScheduler(PermissionUtil::reloadPermissions, 10);
+
         }
 
         @EventHandler
         public void onGMSystem(GMSystemEvent event) {
+
             PATScheduler.createScheduler(PermissionUtil::reloadPermissions, 10);
+
         }
+
     }
+
 }

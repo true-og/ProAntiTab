@@ -14,24 +14,27 @@ import java.util.List;
 public class CreateGroupCommand extends ProCommand {
 
     public CreateGroupCommand() {
-        super(
-                "creategroup",
-                "cg"
-        );
+
+        super("creategroup", "cg");
+
     }
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
 
         if (args.length == 0) {
+
             return false;
+
         }
 
         boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
 
         if (backend) {
+
             sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
             return true;
+
         }
 
         String groupName = args[0];
@@ -39,18 +42,26 @@ public class CreateGroupCommand extends ProCommand {
         boolean registered = group != null;
 
         if (!registered) {
-            GroupManager.registerGroup(groupName);
-        } else groupName = group.getGroupName();
 
-        String message = registered ? Storage.ConfigSections.Messages.GROUP.ALREADY_EXIST : Storage.ConfigSections.Messages.GROUP.CREATE;
+            GroupManager.registerGroup(groupName);
+
+        } else
+            groupName = group.getGroupName();
+
+        String message = registered ? Storage.ConfigSections.Messages.GROUP.ALREADY_EXIST
+                : Storage.ConfigSections.Messages.GROUP.CREATE;
         message = StringUtils.replace(message, "%group%", groupName);
 
         sender.sendMessage(message);
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
+
         return Collections.emptyList();
+
     }
+
 }

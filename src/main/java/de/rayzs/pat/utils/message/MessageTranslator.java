@@ -17,6 +17,7 @@ public class MessageTranslator {
     private static Translator translator = null;
 
     public static void initialize() {
+
         colors.put('1', "<dark_blue>");
         colors.put('2', "<dark_green>");
         colors.put('3', "<dark_aqua>");
@@ -44,89 +45,109 @@ public class MessageTranslator {
         support = !Reflection.isCraftbukkit() && (Reflection.isAtLeast(1, 18) || Reflection.isProxyServer());
 
         if (support) {
+
             translator = Reflection.isVelocityServer() ? new VelocityMessageTranslator()
-                    : Reflection.isProxyServer() ? new BungeeMessageTranslator()
-                    : new BukkitMessageTranslator();
+                    : Reflection.isProxyServer() ? new BungeeMessageTranslator() : new BukkitMessageTranslator();
+
         }
+
     }
 
     public static String translateLegacy(String text) {
+
         text = replaceMessage(text);
-        if(!text.contains("§")) return text;
+        if (!text.contains("§"))
+            return text;
 
         for (Map.Entry<Character, String> entry : colors.entrySet())
             text = text.replace("§" + entry.getKey(), entry.getValue());
 
         return text;
+
     }
 
     public static String colorless(String text) {
+
         text = replaceMessage(text);
-        if(!text.contains("§")) return text;
+        if (!text.contains("§"))
+            return text;
 
         for (Map.Entry<Character, String> entry : colors.entrySet())
             text = text.replace("§" + entry.getKey(), "");
 
         return text;
+
     }
 
     public static void send(Object target, MultipleMessagesHelper texts) {
+
         String stringList = StringUtils.getStringList(texts.getLines(), "\n");
         send(target, stringList);
+
     }
 
     public static void send(Object target, MultipleMessagesHelper texts, String... replacements) {
+
         String stringList = StringUtils.getStringList(texts.getLines(), "\n");
         send(target, stringList, replacements);
+
     }
 
     public static void send(Object target, List<String> texts) {
+
         String stringList = StringUtils.getStringList(texts, "\n");
         send(target, stringList);
+
     }
 
     public static void send(Object target, List<String> texts, String... replacements) {
+
         texts = replaceMessageList(texts, replacements);
         send(target, texts);
+
     }
 
     public static void send(Object target, String text, String... replacements) {
-        if (text.isEmpty()) return;
+
+        if (text.isEmpty())
+            return;
 
         text = replaceMessageString(target, text, replacements);
 
-        if (text.contains("%no-message%")) return;
+        if (text.contains("%no-message%"))
+            return;
 
-        if(translator == null) {
+        if (translator == null) {
 
-            CommandSender sender = target instanceof CommandSender
-                    ? (CommandSender) target
+            CommandSender sender = target instanceof CommandSender ? (CommandSender) target
                     : CommandSenderHandler.from(target);
 
             if (!PlaceholderReplacer.process(sender, text, sender::sendMessage))
                 sender.sendMessage(text);
 
             return;
+
         }
 
-        if (PlaceholderReplacer.process(target, text, result -> translator.send(target, result))) return;
+        if (PlaceholderReplacer.process(target, text, result -> translator.send(target, result)))
+            return;
 
         translator.send(target, text);
+
     }
 
     public static String replaceMessage(String text) {
+
         return replaceMessage(null, text);
+
     }
 
     public static String replaceMessage(Object targetObj, String text) {
-        CommandSender sender = targetObj == null ? null
-                : targetObj instanceof CommandSender
-                ? (CommandSender) targetObj
-                : CommandSenderHandler.from(targetObj);
 
-        String executorName = (sender == null || sender.isConsole())
-                ? ""
-                : sender.getName();
+        CommandSender sender = targetObj == null ? null
+                : targetObj instanceof CommandSender ? (CommandSender) targetObj : CommandSenderHandler.from(targetObj);
+
+        String executorName = (sender == null || sender.isConsole()) ? "" : sender.getName();
 
         String token = (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || Reflection.isProxyServer())
                 ? Storage.CENSORED_TOKEN
@@ -134,77 +155,99 @@ public class MessageTranslator {
 
         String serverName = Storage.SERVER_NAME == null ? "/" : Storage.SERVER_NAME;
 
-        text = StringUtils.replace(text,
-                "&", "§",
-                "\\n", "\n",
-                "%executor%", executorName,
-                "%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX,
-                "%pat_general_prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX,
-                "%token%", token,
-                "%sync_server_name%", serverName,
-                "%server%", serverName,
-                "%current_version%", Storage.CURRENT_VERSION,
-                "%newest_version%", Storage.NEWER_VERSION
-        );
+        text = StringUtils.replace(text, "&", "§", "\\n", "\n", "%executor%", executorName, "%prefix%",
+                Storage.ConfigSections.Messages.PREFIX.PREFIX, "%pat_general_prefix%",
+                Storage.ConfigSections.Messages.PREFIX.PREFIX, "%token%", token, "%sync_server_name%", serverName,
+                "%server%", serverName, "%current_version%", Storage.CURRENT_VERSION, "%newest_version%",
+                Storage.NEWER_VERSION);
 
         return PlaceholderReplacer.replace(targetObj, text);
+
     }
 
     public static String replaceMessageString(Object targetObj, String rawText, String... replacements) {
+
         return replaceMessage(targetObj, StringUtils.replace(rawText, replacements));
+
     }
 
     public static List<String> replaceMessageList(MultipleMessagesHelper rawText, String... replacements) {
+
         return replaceMessageList(rawText.getLines(), replacements);
+
     }
 
     public static List<String> replaceMessageList(List<String> rawText, String... replacements) {
+
         final HashMap<String, String> REPLACEMENTS = new HashMap<>();
         List<String> result = new ArrayList<>();
 
-        if(replacements != null) {
+        if (replacements != null) {
+
             String firstReplacementInput = null, secondReplacementInput = null;
             for (String replacement : replacements) {
-                if (firstReplacementInput == null) firstReplacementInput = replacement;
-                else secondReplacementInput = replacement;
+
+                if (firstReplacementInput == null)
+                    firstReplacementInput = replacement;
+                else
+                    secondReplacementInput = replacement;
 
                 if (firstReplacementInput != null && secondReplacementInput != null) {
+
                     REPLACEMENTS.put(firstReplacementInput, secondReplacementInput);
                     firstReplacementInput = null;
                     secondReplacementInput = null;
+
                 }
+
             }
+
         }
 
         rawText.forEach(text -> {
-            if(replacements != null)
+
+            if (replacements != null)
                 for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
                     text = text.replace(entry.getKey(), entry.getValue());
             String resultText = replaceMessage(text);
             result.add(resultText);
+
         });
 
         return result;
+
     }
 
     public static void sendActionbar(Object targetObj, String message) {
+
         translator.sendActionbar(targetObj, message);
+
     }
 
     public static void sendTitle(Object targetObj, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+
         translator.sendTitle(targetObj, title, subtitle, fadeIn, stay, fadeOut);
+
     }
 
     public static void playSound(Object targetObj, String soundKey, float volume, float pitch) throws Exception {
+
         translator.playSound(targetObj, soundKey, volume, pitch);
+
     }
 
     public static void closeAudiences() {
-        if(translator == null) return;
+
+        if (translator == null)
+            return;
         translator.close();
+
     }
 
     public static boolean isSupported() {
+
         return support;
+
     }
+
 }

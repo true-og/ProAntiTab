@@ -9,20 +9,29 @@ public abstract class UpdatePlayerCommandsEvent extends PATEvent<UpdatePlayerCom
     private boolean serverBased;
 
     public UpdatePlayerCommandsEvent() {
+
         super(null);;
+
     }
 
     public UpdatePlayerCommandsEvent(Object senderObj, List<String> commands, boolean serverBased) {
+
         super(senderObj);
         this.commands = commands;
         this.serverBased = serverBased;
+
     }
 
     public List<String> getCommands() {
+
         return commands;
+
     }
 
     public boolean isServerBased() {
+
         return serverBased;
+
     }
+
 }

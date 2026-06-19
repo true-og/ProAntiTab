@@ -9,14 +9,20 @@ public class ForwardConsoleNotificationAlertsSection extends ConfigStorage {
     public boolean ENABLED;
 
     public ForwardConsoleNotificationAlertsSection() {
+
         super("forward-console-notification-alerts");
+
     }
 
     @Override
     public void load() {
+
         super.load();
 
-        if(!Reflection.isProxyServer()) return;
+        if (!Reflection.isProxyServer())
+            return;
         ENABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
+
     }
+
 }

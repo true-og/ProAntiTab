@@ -11,15 +11,22 @@ public class CustomUnknownCommandSection extends ConfigStorage {
     public MultipleMessagesHelper MESSAGE;
 
     public CustomUnknownCommandSection() {
+
         super("custom-unknown-command");
+
     }
 
     @Override
     public void load() {
+
         super.load();
 
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+            return;
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
-        MESSAGE = new MultipleMessagesHelper(this, "message", Collections.singletonList("&cThis command does not exist!"));
+        MESSAGE = new MultipleMessagesHelper(this, "message",
+                Collections.singletonList("&cThis command does not exist!"));
+
     }
+
 }

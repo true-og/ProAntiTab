@@ -8,12 +8,17 @@ public class AllowGroupOverrulingSection extends ConfigStorage {
     public boolean ENABLED;
 
     public AllowGroupOverrulingSection() {
+
         super("allow-group-overruling");
+
     }
 
     @Override
     public void load() {
+
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
+
     }
+
 }

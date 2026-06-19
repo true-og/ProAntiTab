@@ -8,21 +8,31 @@ import org.bukkit.entity.Player;
 
 public class ListGroupCommandsPlaceholder extends PlaceholderStorage {
 
-    public ListGroupCommandsPlaceholder() { super("list_commands_group_"); }
+    public ListGroupCommandsPlaceholder() {
+
+        super("list_commands_group_");
+
+    }
 
     public String SPLITTER;
 
     @Override
     public String onRequest(Player player, String param) {
+
         Group group = GroupManager.getGroupByName(param);
-        if(group == null) return null;
+        if (group == null)
+            return null;
 
         return StringUtils.getStringList(group.getCommands(), SPLITTER);
+
     }
 
     @Override
     public void load() {
+
         super.load();
         SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7, &e").getOrSet();
+
     }
+
 }

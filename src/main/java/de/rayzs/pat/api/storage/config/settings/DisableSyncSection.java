@@ -9,14 +9,20 @@ public class DisableSyncSection extends ConfigStorage {
     public boolean DISABLED;
 
     public DisableSyncSection() {
+
         super("disable-sync");
+
     }
 
     @Override
     public void load() {
+
         super.load();
 
-        if(!Reflection.isProxyServer()) return;
+        if (!Reflection.isProxyServer())
+            return;
         DISABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
+
     }
+
 }
