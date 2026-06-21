@@ -9,7 +9,7 @@
 # but a few people seem not to like my design for a custom update-notification message...
 # Well... that's basically the whole reason for this one here. xd
 updater:
-  enabled: true
+  enabled: false
   period: 10000
 
   announce-missing-parts: true
@@ -70,7 +70,7 @@ turn-blacklist-to-whitelist: true
 #   /Help --> Blocked
 #   /HelP --> Allowed
 # Pro tip: You can also just use auto-lowercase-commands feature instead. ^^
-base-command-case-sensitive: true
+base-command-case-sensitive: false
 
 # (!) Warning:
 #     Enabling this could lead to performance issues depending on
@@ -106,7 +106,7 @@ custom-protocol-ping:
   # This number here determines the outcome for the %online_extended% placeholder.
   # It's the current amount of players increased by this number.
   # For example: 5/20 becomes 6/20
-  extend-online-count: 1
+  extend-online-count: 0
   # true: Use new calculated online-count (%online_extended%) as max-players count.
   # false: Use the default max-players count.
   use-as-maxplayers: false
@@ -125,7 +125,7 @@ custom-protocol-ping:
 
   # The displayed message when you hover over the player count.
   custom-playerlist:
-    enabled: true
+    enabled: false
 
     # Available placeholders:
     # %players%           - list of players
@@ -142,9 +142,9 @@ custom-protocol-ping:
 # for if a command is blocked or really doesn't exist. ^^
 # Good to hide real and not-real commands from your players.
 custom-unknown-command:
-  enabled: false
+  enabled: true
   message:
-    - '&cThis command does not exist!'
+    - "&6WARNING: &cYou don't have access to that command!"
 
 #>> HTP (Overwritten)
 # This setting decides if a listed command should be cancelled from execution or not.
@@ -153,14 +153,14 @@ custom-unknown-command:
 cancel-blocked-commands:
   enabled: true
   base-command-message:
-    - '%prefix% &cThis command &8(&4%command%&8) &cis blocked!'
+    - '%prefix% &cThe command &8(&4%command%&8) &cis blocked!'
   sub-command-message:
     - '%prefix% &cCommand &8(&4%command%&8) &cwith the provided sub-argument is not allowed!'
 
 #>> HTP (Overwritten)
 # Here you can customize your own fake '/plugins' command.
 custom-plugins:
-  enabled: true
+  enabled: false
 
   # If this is set to true, the command will always be tab-completable,
   # even if the command is supposed to be blocked
@@ -192,14 +192,14 @@ custom-version:
     - bukkit:version
     - bukkit:ver
   message:
-    - '&fThis server is running CraftBukkit version git-NasaSpigot-294 (MC: X)'
+    - '&5This server is running a soft fork of &5&lPurpur 1.19.4 &r&5with custom patches by &a&lTrue&r&4OG &eNetwork'
 
 #>> HTP (Overwritten)
 # Here you can disable all namespace commands.
 # Namespace commands are commands like plugin:command (e.g: essentials:warp)
 # You can bypass this restriction with the proantitab.namespace permission.
 block-namespace-commands:
-  enabled: false
+  enabled: true
   # Basically blocks the command execution no matter if
   # 'cancel-blocked-commands' is enabled or not.
   always-block-command: true
@@ -208,15 +208,15 @@ block-namespace-commands:
 # Auto lowercase all commands when being executed,
 # such that something like /PAY turns into /pay.
 auto-lowercase-commands:
-  enabled: false
+  enabled: true
 
 # Patches a small exploit which causes the server to lag.
 # Due to the fact that PAT interacts directly with Tab-Completions and their packets,
 # it would be a waste not to provide some simple patches like these. ^^
 patch-exploits:
   enabled: true
-  alert-message: '%prefix% &4%player% &ctried to crash/lag the server.'
-  kick-message: '&cFailed to read packet! Please reconnect.'
+  alert-message: '%prefix% &4%player% &ctried to crash/lag the server using commands.'
+  kick-message: "&cFailed to read packet! Please don't spam commands."
 
 # Small extra option on how to respond to players who failed
 # the injection process. ONLY necessary for those who are using
@@ -225,7 +225,7 @@ patch-exploits:
 # spoofed or not.
 injection-failed:
   kick-on-failure: true
-  suppress-exceptions: false
+  suppress-exceptions: true
   kick-message: '&cInjection process failed! Please reconnect.'
   console-message: '&cInjection process failed! (%player%)'
 
@@ -234,7 +234,7 @@ injection-failed:
 # Normally there is something like 'Purpur', or 'Spigot'.
 # With this feature, you are able to change and even animate it.
 custom-server-brand:
-  enabled: false
+  enabled: true
 
   # Determines the speed at which the animation goes.
   # Set this to -1 to disable the animation.
@@ -245,7 +245,7 @@ custom-server-brand:
   # automatic update of information.
   # That means that placeholders won't update unless the
   # player rejoins the server.
-  repeat-delay: 3
+  repeat-delay: -1
 
   # This is the list of the animation
   # Possible placeholders:
@@ -254,19 +254,7 @@ custom-server-brand:
   # %world%         - name of the world where the player is
   # and the other placeholders from PlaceholderAPI.
   brands:
-    - '&f&lP&froAntiTab |'
-    - '&fP&lr&foAntiTab /'
-    - '&fPr&lo&fAntiTab -'
-    - '&fPro&lA&fntiTab |'
-    - '&fProA&ln&ftiTab \'
-    - '&fProAn&lt&fiTab |'
-    - '&fProAnt&li&fTab /'
-    - '&fProAnti&lT&fab -'
-    - '&fProAnti&lT&fab \'
-    - '&fProAntiT&la&fb |'
-    - '&fProAntiTa&lb&f /'
-    - '&fProAntiTab -'
-    - '&fProAntiTab \'
+    - '&5&lPurpur 1.19.4 (forked)'
 
 # ------------------------------------------------------------------------------
 #       __  ___
