@@ -1,9 +1,144 @@
 global:
   commands:
+    - help
+    - list
+    - plugins
+    - tps
+    - scoreboard
+    - msg
+    - r
+    - mail
+    - tpa
+    - tpaccept
+    - tpdeny
+    - tpacancel
+    - tp
+    - home
+    - sethome
+    - delhome
     - spawn
+    - suicide
+    - ignore
+    - rules
+    - time
+    - plugin=diamondbank-og
+    - plugin=quickshop-og
+    - plugin=duels-og
+    - plugin=playerbounties-og
+    - plugin=finditem
+    - pt
+    - playtime
+    - joindate
+    - ping
+    - ranks
+    - afk
+    - plugins
+    - tps
 groups:
-  examplegroup:
+  og-pro:
     priority: 1
     commands:
-      - tell
-      - msg
+      - enderchest
+      - ec
+      - hat
+      - editsign
+      - sit
+      - particlehats
+      - ph
+      - cosmetics
+  og-master:
+    priority: 1
+    commands:
+      - back
+      - toggledeathcoordinates
+  youtube:
+    priority: 1
+    commands:
+      - playsound
+  helper:
+    priority: 1
+    commands:
+      - gamemode
+      - gm
+      - gmc
+      - gms
+      - gma
+      - gmsp
+      - clearinventory
+      - ci
+      - skull
+      - weather
+      - image
+      - noclip
+      - kick
+      - tempban
+      - tempmute
+      - ascend
+      - descend
+      - thru
+      - up
+      - jumpto
+  builder:
+    priority: 1
+    commands:
+      - plugin=worldedit
+      - holograms
+      - hologram
+      - holo
+  moderator:
+    priority: 1
+    commands:
+      - ban
+      - banip
+      - tempban
+      - kick
+      - mute
+      - vanish
+      - v
+      - fly
+      - give
+      - enchant
+      - broadcast
+      - me
+      - seen
+      - whois
+      - world
+      - gc
+      - tellraw
+      - ncp
+      - plugin=coreprotect
+      - plugin=luckperms
+      - plugin=openinv
+      - plugin=staff-og
+      - plugin=worldguard
+      - plugin=placeholderapi
+      - plugin=oldcombatmechanics
+  admin:
+    priority: 1
+    commands:
+      - plugin=advancedregionmarket
+      - plugin=chunky
+      - plugin=myworlds
+      - plugin=spark
+      - plugin=supervanish
+      - plugin=sudosigns
+      - plugin=theherobrine
+      - plugin=tab
+      - plugin=buildbattle
+      - plugin=particlehats
+      - whitelist
+      - stop
+      - mspt
+      - summon
+      - fill
+      - clone
+      - data
+      - effect
+      - gamerule
+      - seed
+      - worldborder
+      - locatebiome
+      - unban
+      - unbanip
+      - setspawn
+      - petmaster
