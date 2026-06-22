@@ -1,5 +1,3 @@
-/* This is free and unencumbered software released into the public domain */
-
 /* ------------------------------ Plugins ------------------------------ */
 plugins {
     id("java") // Import Java plugin.
@@ -98,6 +96,7 @@ tasks.withType<AbstractArchiveTask>().configureEach { // Ensure reproducible .ja
 /* ----------------------------- Shadow -------------------------------- */
 tasks.shadowJar {
     archiveFileName.set("ProAntiTab.jar") // Match the original Maven finalName.
+    relocate("net.kyori", "de.rayzs.pat.libs.kyori") // Isolate shaded Adventure from the server's bundled copy.
 }
 
 tasks.jar { archiveClassifier.set("part") } // Applies to root jarfile only.
