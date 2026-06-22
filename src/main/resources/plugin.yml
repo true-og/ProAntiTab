@@ -5,7 +5,7 @@ website: https://www.rayzs.de/products/proantitab/page
 author: Rayzs_YT
 version: 2.3.2
 api-version: 1.13
-folia-supported: true
+folia-supported: false
 main: de.rayzs.pat.plugin.BukkitLoader
 
 softdepend: [PlaceholderAPI, LuckPerms, GroupManager, Skript, ViaVersion, ViaBackwards, ViaRewind]
