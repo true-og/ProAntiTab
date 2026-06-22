@@ -134,12 +134,19 @@ public class CommandsCache {
         if (!PermissionUtil.hasBypassPermission(sender)) {
 
             boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender);
+            boolean hasSlashBypass = Storage.ConfigSections.Settings.BLOCK_SLASH_COMMANDS.doesBypass(sender);
 
             playerCommands.removeIf(command -> {
 
                 if (!hasNamespaceBypass
                         && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command))
                 {
+
+                    return true;
+
+                }
+
+                if (!hasSlashBypass && Storage.ConfigSections.Settings.BLOCK_SLASH_COMMANDS.isCommand(command)) {
 
                     return true;
 

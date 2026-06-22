@@ -446,6 +446,7 @@ public class Storage {
             public static AllowGroupOverrulingSection ALLOW_GROUP_OVERRULING = new AllowGroupOverrulingSection();
             public static AutoLowercaseCommandsSection AUTO_LOWERCASE_COMMANDS = new AutoLowercaseCommandsSection();
             public static BlockNamespaceCommandsSection BLOCK_NAMESPACE_COMMANDS = new BlockNamespaceCommandsSection();
+            public static BlockSlashCommandsSection BLOCK_SLASH_COMMANDS = new BlockSlashCommandsSection();
             public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
             public static InjectionFailedSection INJECTION_FAILED = new InjectionFailedSection();
             public static PatchExploitSection PATCH_EXPLOITS = new PatchExploitSection();

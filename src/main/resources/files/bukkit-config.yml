@@ -204,6 +204,15 @@ block-namespace-commands:
   # 'cancel-blocked-commands' is enabled or not.
   always-block-command: true
 
+# Hides every slash-prefixed command from tab-completion.
+# These are the WorldEdit-style "//" commands (//set, //cut, //material, ...),
+# whose registered name itself contains a slash.
+# This is tab-only: it just removes them from suggestions, it does not block
+# execution, so players who already have access can still type them manually.
+# You can bypass this (keep them tab-completable) with the proantitab.slash permission.
+block-slash-commands:
+  enabled: true
+
 #>> HTP (Overwritten)
 # Auto lowercase all commands when being executed,
 # such that something like /PAY turns into /pay.
