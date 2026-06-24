@@ -21,11 +21,12 @@ global:
     - ignore
     - rules
     - time
-    - plugin=diamondbank-og
     - plugin=quickshop-og
     - plugin=duels-og
+    - plugin=splegg-og
+    - plugin=theherobrine-og
     - plugin=playerbounties-og
-    - plugin=finditem
+    - finditem
     - pt
     - playtime
     - joindate
@@ -62,10 +63,8 @@ groups:
       - gm
       - gmc
       - gms
-      - gma
       - gmsp
       - clearinventory
-      - ci
       - skull
       - weather
       - image
