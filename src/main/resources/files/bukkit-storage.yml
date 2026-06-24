@@ -23,8 +23,13 @@ global:
     - time
     - plugin=quickshop-og
     - plugin=duels-og
-    - plugin=splegg-og
-    - plugin=theherobrine-og
+    - splegg
+    - sp
+    - vote
+    - v
+    - hbjoin
+    - hbspectate
+    - hub
     - plugin=playerbounties-og
     - finditem
     - pt
@@ -121,10 +126,18 @@ groups:
       - plugin=spark
       - plugin=supervanish
       - plugin=sudosigns
-      - plugin=theherobrine
       - plugin=tab
       - plugin=buildbattle
       - plugin=particlehats
+      - hbsetherobrine
+      - hbcreatelobby
+      - hbdeletelobby
+      - hbforcestart
+      - hbdropshard
+      - hbpausetimer
+      - hbreloadconfigs
+      - hbsetspawn
+      - hbwizard
       - whitelist
       - stop
       - mspt
