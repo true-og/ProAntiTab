@@ -21,22 +21,23 @@ global:
     - ignore
     - rules
     - time
-    - plugin=quickshop-og
-    - plugin=duels-og
+    - duel
+    - qs
     - splegg
-    - sp
     - vote
     - v
     - hbjoin
     - hbspectate
     - hub
-    - plugin=playerbounties-og
+    - bounty
     - finditem
     - pt
     - playtime
+    - jd
     - joindate
     - ping
     - ranks
+    - buy
     - afk
     - plugins
     - tps
@@ -49,14 +50,14 @@ groups:
       - hat
       - editsign
       - sit
-      - particlehats
-      - ph
+      - fly
       - cosmetics
   og-master:
     priority: 1
     commands:
       - back
       - toggledeathcoordinates
+      - co
   youtube:
     priority: 1
     commands:
@@ -64,15 +65,11 @@ groups:
   helper:
     priority: 1
     commands:
-      - gamemode
-      - gm
       - gmc
       - gms
-      - gmsp
       - clearinventory
       - skull
       - weather
-      - image
       - noclip
       - kick
       - tempban
@@ -93,13 +90,13 @@ groups:
     priority: 1
     commands:
       - ban
-      - banip
+      - permban
       - tempban
       - kick
       - mute
+      - tempmute
+      - permmute
       - vanish
-      - v
-      - fly
       - give
       - enchant
       - broadcast
@@ -113,22 +110,17 @@ groups:
       - plugin=coreprotect
       - plugin=luckperms
       - plugin=openinv
-      - plugin=staff-og
       - plugin=worldguard
       - plugin=placeholderapi
       - plugin=oldcombatmechanics
   admin:
     priority: 1
     commands:
-      - plugin=advancedregionmarket
       - plugin=chunky
       - plugin=myworlds
       - plugin=spark
-      - plugin=supervanish
       - plugin=sudosigns
       - plugin=tab
-      - plugin=buildbattle
-      - plugin=particlehats
       - hbsetherobrine
       - hbcreatelobby
       - hbdeletelobby
@@ -140,18 +132,11 @@ groups:
       - hbwizard
       - whitelist
       - stop
-      - mspt
       - summon
-      - fill
-      - clone
-      - data
       - effect
       - gamerule
-      - seed
       - worldborder
       - locatebiome
       - imageframe
       - unban
       - unbanip
-      - setspawn
-      - petmaster
