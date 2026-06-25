@@ -150,6 +150,7 @@ groups:
       - seed
       - worldborder
       - locatebiome
+      - imageframe
       - unban
       - unbanip
       - setspawn
