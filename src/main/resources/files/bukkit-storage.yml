@@ -41,6 +41,17 @@ global:
     - afk
     - plugins
     - tps
+    - balance
+    - bal
+    - balancetop
+    - baltop
+    - deposit
+    - withdraw
+    - pay
+    - compress
+    - autocompress
+    - autodeposit
+    - diamondbankhelp
 groups:
   og-pro:
     priority: 1
@@ -140,3 +151,4 @@ groups:
       - imageframe
       - unban
       - unbanip
+      - plugin=diamondbank-og
