@@ -76,8 +76,6 @@ groups:
   helper:
     priority: 1
     commands:
-      - gmc
-      - gms
       - clearinventory
       - skull
       - weather
@@ -151,4 +149,5 @@ groups:
       - imageframe
       - unban
       - unbanip
+      - setspawn
       - plugin=diamondbank-og
