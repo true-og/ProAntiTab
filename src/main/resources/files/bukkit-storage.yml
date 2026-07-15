@@ -52,7 +52,6 @@ global:
     - autocompress
     - autodeposit
     - diamondbankhelp
-    - sudosigns
 groups:
   og-pro:
     priority: 1
@@ -129,7 +128,7 @@ groups:
       - plugin=chunky
       - plugin=myworlds
       - plugin=spark
-      - plugin=sudosigns
+      - plugin=sudosigns-og
       - plugin=tab
       - hbsetherobrine
       - hbcreatelobby
