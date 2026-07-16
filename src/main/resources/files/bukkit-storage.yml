@@ -52,6 +52,8 @@ global:
     - autocompress
     - autodeposit
     - diamondbankhelp
+    - spleef
+    - bb
 groups:
   og-pro:
     priority: 1
@@ -63,6 +65,7 @@ groups:
       - sit
       - fly
       - cosmetics
+      - chatitem
   og-master:
     priority: 1
     commands:
