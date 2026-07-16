@@ -54,6 +54,7 @@ global:
     - diamondbankhelp
     - spleef
     - bb
+    - buildbattle
 groups:
   og-pro:
     priority: 1
@@ -117,7 +118,7 @@ groups:
       - whois
       - world
       - gc
-      - tellraw
+      - hbforcestart
       - ncp
       - plugin=coreprotect
       - plugin=luckperms
@@ -136,7 +137,6 @@ groups:
       - hbsetherobrine
       - hbcreatelobby
       - hbdeletelobby
-      - hbforcestart
       - hbdropshard
       - hbpausetimer
       - hbreloadconfigs
@@ -153,4 +153,4 @@ groups:
       - unban
       - unbanip
       - setspawn
-      - plugin=diamondbank-og
+      - arenaregen
