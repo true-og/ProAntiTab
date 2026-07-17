@@ -23,6 +23,8 @@ global:
     - time
     - duel
     - qs
+    - claimquest
+    - questgui
     - splegg
     - vote
     - v
