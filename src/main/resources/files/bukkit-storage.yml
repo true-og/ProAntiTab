@@ -59,6 +59,27 @@ global:
     - spleef
     - bb
     - buildbattle
+    - utilities
+    - togglephantoms
+    - togglecramming
+    - bing
+    - colorcodes
+    - kit
+    - wild
+    - guild
+    - f
+    - faction
+    - seed
+    - rtp
+    - union
+    - unions
+    - clan
+    - clans
+    - ally
+    - accept
+    - deny
+    - more
+    - u
 groups:
   og-pro:
     priority: 1
