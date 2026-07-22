@@ -6,7 +6,14 @@ global:
     - tps
     - scoreboard
     - msg
+    - whisper
+    - pm
     - r
+    - reply
+    - gc
+    - g
+    - translatemessage
+    - translatesettings
     - mail
     - tpa
     - tpaccept
@@ -26,6 +33,7 @@ global:
     - claimquest
     - questgui
     - splegg
+    - sp
     - vote
     - v
     - hbjoin
@@ -33,6 +41,10 @@ global:
     - hub
     - bounty
     - finditem
+    - find
+    - shopsearch
+    - searchshop
+    - searchitem
     - pt
     - playtime
     - jd
@@ -59,6 +71,11 @@ global:
     - spleef
     - bb
     - buildbattle
+    - buildb
+    - quickshop
+    - shop
+    - chestshop
+    - cshop
     - utilities
     - togglephantoms
     - togglecramming
@@ -80,7 +97,48 @@ global:
     - deny
     - more
     - u
+    - votehelp
+    - vhelp
+    - votetotal
+    - vtotal
+    - votelast
+    - vlast
+    - votenext
+    - vnext
+    - votetop
+    - vtop
+    - votetoday
+    - vtoday
+    - votegui
+    - vgui
+    - voteurl
+    - vurl
+    - voteparty
+    - vparty
+    - voteshop
+    - vshop
+    - votebest
+    - vbest
+    - votestreak
+    - vstreak
+    - votetogglebroadcast
+    - vtogglebroadcast
+    - votepoints
+    - vpoints
+    - votetogglereminders
+    - vtogglereminder
+    - vtoggle
+    - votelist
+    - vlist
+    - voteall
+    - vall
+    - votechoices
 groups:
+  og:
+    priority: 1
+    commands:
+      - pc
+      - p
   og-pro:
     priority: 1
     commands:
@@ -117,6 +175,8 @@ groups:
       - thru
       - up
       - jumpto
+      - sc
+      - s
   builder:
     priority: 1
     commands:
@@ -179,3 +239,18 @@ groups:
       - unbanip
       - setspawn
       - arenaregen
+      - chatconfigreload
+      - dc
+      - d
+      - setbankbalance
+      - setbankbal
+      - diamondbankreload
+      - enableeconomy
+      - disableeconomy
+      - dbogtoggledebug
+      - buildbattleadmin
+      - bba
+      - buildbadmin
+      - finditemadmin
+      - fiadmin
+      - plugin=votingplugin
