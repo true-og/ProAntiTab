@@ -180,9 +180,10 @@ groups:
     priority: 1
     commands:
       - plugin=worldedit
-      - holograms
       - hologram
       - holo
+      - nc
+      - noclip
   moderator:
     priority: 1
     commands:
