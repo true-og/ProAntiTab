@@ -175,8 +175,7 @@ groups:
       - thru
       - up
       - jumpto
-      - sc
-      - s
+      - gmic
   builder:
     priority: 1
     commands:
