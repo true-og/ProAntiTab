@@ -21,6 +21,7 @@ global:
     - tpacancel
     - tp
     - home
+    - homes
     - sethome
     - delhome
     - spawn
