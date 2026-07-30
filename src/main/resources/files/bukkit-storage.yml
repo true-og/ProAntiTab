@@ -4,6 +4,7 @@ global:
     - list
     - plugins
     - tps
+    - spawnback
     - scoreboard
     - msg
     - whisper
