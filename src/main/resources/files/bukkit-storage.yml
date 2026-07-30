@@ -243,6 +243,7 @@ groups:
       - chatconfigreload
       - dc
       - d
+      - setworldspawn
       - setbankbalance
       - setbankbal
       - diamondbankreload
