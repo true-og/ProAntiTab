@@ -21,6 +21,13 @@ global:
     - tpdeny
     - tpacancel
     - tp
+    - teleport
+    - essentials:tp
+    - essentials:teleport
+    - minecraft:tp
+    - minecraft:teleport
+    - bukkit:tp
+    - bukkit:teleport
     - home
     - homes
     - sethome
