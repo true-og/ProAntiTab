@@ -43,6 +43,7 @@ global:
     - questgui
     - splegg
     - sp
+    - spjoin
     - vote
     - v
     - hbjoin
@@ -81,6 +82,7 @@ global:
     - bb
     - buildbattle
     - buildb
+    - bbjoin
     - quickshop
     - shop
     - chestshop
@@ -213,6 +215,8 @@ groups:
       - world
       - gc
       - hbforcestart
+      - spforcestart
+      - bbforcestart
       - ncp
       - plugin=coreprotect
       - plugin=luckperms
